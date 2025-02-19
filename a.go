@@ -17,101 +17,101 @@ import (
 )
 
 const (
-	Dm_build_334 = 8192
-	Dm_build_335 = 2 * time.Second
+	Dm_build_694 = 8192
+	Dm_build_695 = 2 * time.Second
 )
 
-type dm_build_336 struct {
-	dm_build_337 net.Conn
-	dm_build_338 *tls.Conn
-	dm_build_339 *Dm_build_0
-	dm_build_340 *DmConnection
-	dm_build_341 security.Cipher
-	dm_build_342 bool
-	dm_build_343 bool
-	dm_build_344 *security.DhKey
+type dm_build_696 struct {
+	dm_build_697 net.Conn
+	dm_build_698 *tls.Conn
+	dm_build_699 *Dm_build_360
+	dm_build_700 *DmConnection
+	dm_build_701 security.Cipher
+	dm_build_702 bool
+	dm_build_703 bool
+	dm_build_704 *security.DhKey
 
-	dm_build_345 bool
-	dm_build_346 string
-	dm_build_347 bool
+	dm_build_705 bool
+	dm_build_706 string
+	dm_build_707 bool
 }
 
-func dm_build_348(dm_build_349 context.Context, dm_build_350 *DmConnection) (*dm_build_336, error) {
-	var dm_build_351 net.Conn
-	var dm_build_352 error
+func dm_build_708(dm_build_709 context.Context, dm_build_710 *DmConnection) (*dm_build_696, error) {
+	var dm_build_711 net.Conn
+	var dm_build_712 error
 
 	dialsLock.RLock()
-	dm_build_353, dm_build_354 := dials[dm_build_350.dmConnector.dialName]
+	dm_build_713, dm_build_714 := dials[dm_build_710.dmConnector.dialName]
 	dialsLock.RUnlock()
-	if dm_build_354 {
-		dm_build_351, dm_build_352 = dm_build_353(dm_build_349, dm_build_350.dmConnector.host+":"+strconv.Itoa(int(dm_build_350.dmConnector.port)))
+	if dm_build_714 {
+		dm_build_711, dm_build_712 = dm_build_713(dm_build_709, dm_build_710.dmConnector.host+":"+strconv.Itoa(int(dm_build_710.dmConnector.port)))
 	} else {
-		dm_build_351, dm_build_352 = dm_build_356(dm_build_350.dmConnector.host+":"+strconv.Itoa(int(dm_build_350.dmConnector.port)), time.Duration(dm_build_350.dmConnector.socketTimeout)*time.Second)
+		dm_build_711, dm_build_712 = dm_build_716(dm_build_710.dmConnector.host+":"+strconv.Itoa(int(dm_build_710.dmConnector.port)), time.Duration(dm_build_710.dmConnector.socketTimeout)*time.Second)
 	}
-	if dm_build_352 != nil {
-		return nil, dm_build_352
+	if dm_build_712 != nil {
+		return nil, dm_build_712
 	}
 
-	dm_build_355 := dm_build_336{}
-	dm_build_355.dm_build_337 = dm_build_351
-	dm_build_355.dm_build_339 = Dm_build_3(Dm_build_621)
-	dm_build_355.dm_build_340 = dm_build_350
-	dm_build_355.dm_build_342 = false
-	dm_build_355.dm_build_343 = false
-	dm_build_355.dm_build_345 = false
-	dm_build_355.dm_build_346 = ""
-	dm_build_355.dm_build_347 = false
-	dm_build_350.Access = &dm_build_355
+	dm_build_715 := dm_build_696{}
+	dm_build_715.dm_build_697 = dm_build_711
+	dm_build_715.dm_build_699 = Dm_build_363(Dm_build_989)
+	dm_build_715.dm_build_700 = dm_build_710
+	dm_build_715.dm_build_702 = false
+	dm_build_715.dm_build_703 = false
+	dm_build_715.dm_build_705 = false
+	dm_build_715.dm_build_706 = ""
+	dm_build_715.dm_build_707 = false
+	dm_build_710.Access = &dm_build_715
 
-	return &dm_build_355, nil
+	return &dm_build_715, nil
 }
 
-func dm_build_356(dm_build_357 string, dm_build_358 time.Duration) (net.Conn, error) {
-	dm_build_359, dm_build_360 := net.DialTimeout("tcp", dm_build_357, dm_build_358)
-	if dm_build_360 != nil {
-		return &net.TCPConn{}, ECGO_COMMUNITION_ERROR.addDetail("\tdial address: " + dm_build_357).throw()
+func dm_build_716(dm_build_717 string, dm_build_718 time.Duration) (net.Conn, error) {
+	dm_build_719, dm_build_720 := net.DialTimeout("tcp", dm_build_717, dm_build_718)
+	if dm_build_720 != nil {
+		return &net.TCPConn{}, ECGO_COMMUNITION_ERROR.addDetail("\tdial address: " + dm_build_717).throw()
 	}
 
-	if tcpConn, ok := dm_build_359.(*net.TCPConn); ok {
+	if tcpConn, ok := dm_build_719.(*net.TCPConn); ok {
 		tcpConn.SetKeepAlive(true)
-		tcpConn.SetKeepAlivePeriod(Dm_build_335)
+		tcpConn.SetKeepAlivePeriod(Dm_build_695)
 		tcpConn.SetNoDelay(true)
 
 	}
-	return dm_build_359, nil
+	return dm_build_719, nil
 }
 
-func (dm_build_362 *dm_build_336) dm_build_361(dm_build_363 dm_build_742) bool {
-	var dm_build_364 = dm_build_362.dm_build_340.dmConnector.compress
-	if dm_build_363.dm_build_757() == Dm_build_649 || dm_build_364 == Dm_build_698 {
+func (dm_build_722 *dm_build_696) dm_build_721(dm_build_723 dm_build_1110) bool {
+	var dm_build_724 = dm_build_722.dm_build_700.dmConnector.compress
+	if dm_build_723.dm_build_1125() == Dm_build_1017 || dm_build_724 == Dm_build_1066 {
 		return false
 	}
 
-	if dm_build_364 == Dm_build_696 {
+	if dm_build_724 == Dm_build_1064 {
 		return true
-	} else if dm_build_364 == Dm_build_697 {
-		return !dm_build_362.dm_build_340.Local && dm_build_363.dm_build_755() > Dm_build_695
+	} else if dm_build_724 == Dm_build_1065 {
+		return !dm_build_722.dm_build_700.Local && dm_build_723.dm_build_1123() > Dm_build_1063
 	}
 
 	return false
 }
 
-func (dm_build_366 *dm_build_336) dm_build_365(dm_build_367 dm_build_742) bool {
-	var dm_build_368 = dm_build_366.dm_build_340.dmConnector.compress
-	if dm_build_367.dm_build_757() == Dm_build_649 || dm_build_368 == Dm_build_698 {
+func (dm_build_726 *dm_build_696) dm_build_725(dm_build_727 dm_build_1110) bool {
+	var dm_build_728 = dm_build_726.dm_build_700.dmConnector.compress
+	if dm_build_727.dm_build_1125() == Dm_build_1017 || dm_build_728 == Dm_build_1066 {
 		return false
 	}
 
-	if dm_build_368 == Dm_build_696 {
+	if dm_build_728 == Dm_build_1064 {
 		return true
-	} else if dm_build_368 == Dm_build_697 {
-		return dm_build_366.dm_build_339.Dm_build_267(Dm_build_657) == 1
+	} else if dm_build_728 == Dm_build_1065 {
+		return dm_build_726.dm_build_699.Dm_build_627(Dm_build_1025) == 1
 	}
 
 	return false
 }
 
-func (dm_build_370 *dm_build_336) dm_build_369(dm_build_371 dm_build_742) (err error) {
+func (dm_build_730 *dm_build_696) dm_build_729(dm_build_731 dm_build_1110) (err error) {
 	defer func() {
 		if p := recover(); p != nil {
 			if _, ok := p.(string); ok {
@@ -122,61 +122,61 @@ func (dm_build_370 *dm_build_336) dm_build_369(dm_build_371 dm_build_742) (err e
 		}
 	}()
 
-	dm_build_373 := dm_build_371.dm_build_755()
+	dm_build_733 := dm_build_731.dm_build_1123()
 
-	if dm_build_373 > 0 {
+	if dm_build_733 > 0 {
 
-		if dm_build_370.dm_build_361(dm_build_371) {
-			var retBytes, err = Compress(dm_build_370.dm_build_339, Dm_build_650, int(dm_build_373), int(dm_build_370.dm_build_340.dmConnector.compressID))
+		if dm_build_730.dm_build_721(dm_build_731) {
+			var retBytes, err = Compress(dm_build_730.dm_build_699, Dm_build_1018, int(dm_build_733), int(dm_build_730.dm_build_700.dmConnector.compressID))
 			if err != nil {
 				return err
 			}
 
-			dm_build_370.dm_build_339.Dm_build_14(Dm_build_650)
+			dm_build_730.dm_build_699.Dm_build_374(Dm_build_1018)
 
-			dm_build_370.dm_build_339.Dm_build_55(dm_build_373)
+			dm_build_730.dm_build_699.Dm_build_415(dm_build_733)
 
-			dm_build_370.dm_build_339.Dm_build_83(retBytes)
+			dm_build_730.dm_build_699.Dm_build_443(retBytes)
 
-			dm_build_371.dm_build_756(int32(len(retBytes)) + ULINT_SIZE)
+			dm_build_731.dm_build_1124(int32(len(retBytes)) + ULINT_SIZE)
 
-			dm_build_370.dm_build_339.Dm_build_187(Dm_build_657, 1)
+			dm_build_730.dm_build_699.Dm_build_547(Dm_build_1025, 1)
 		}
 
-		if dm_build_370.dm_build_343 {
-			dm_build_373 = dm_build_371.dm_build_755()
-			var retBytes = dm_build_370.dm_build_341.Encrypt(dm_build_370.dm_build_339.Dm_build_294(Dm_build_650, int(dm_build_373)), true)
+		if dm_build_730.dm_build_703 {
+			dm_build_733 = dm_build_731.dm_build_1123()
+			var retBytes = dm_build_730.dm_build_701.Encrypt(dm_build_730.dm_build_699.Dm_build_654(Dm_build_1018, int(dm_build_733)), true)
 
-			dm_build_370.dm_build_339.Dm_build_14(Dm_build_650)
+			dm_build_730.dm_build_699.Dm_build_374(Dm_build_1018)
 
-			dm_build_370.dm_build_339.Dm_build_83(retBytes)
+			dm_build_730.dm_build_699.Dm_build_443(retBytes)
 
-			dm_build_371.dm_build_756(int32(len(retBytes)))
+			dm_build_731.dm_build_1124(int32(len(retBytes)))
 		}
 	}
 
-	if dm_build_370.dm_build_339.Dm_build_12() > Dm_build_622 {
+	if dm_build_730.dm_build_699.Dm_build_372() > Dm_build_990 {
 		return ECGO_MSG_TOO_LONG.throw()
 	}
 
-	dm_build_371.dm_build_751()
-	if dm_build_370.dm_build_604(dm_build_371) {
-		if dm_build_370.dm_build_338 != nil {
-			dm_build_370.dm_build_339.Dm_build_17(0)
-			if _, err := dm_build_370.dm_build_339.Dm_build_36(dm_build_370.dm_build_338); err != nil {
+	dm_build_731.dm_build_1119()
+	if dm_build_730.dm_build_972(dm_build_731) {
+		if dm_build_730.dm_build_698 != nil {
+			dm_build_730.dm_build_699.Dm_build_377(0)
+			if _, err := dm_build_730.dm_build_699.Dm_build_396(dm_build_730.dm_build_698); err != nil {
 				return err
 			}
 		}
 	} else {
-		dm_build_370.dm_build_339.Dm_build_17(0)
-		if _, err := dm_build_370.dm_build_339.Dm_build_36(dm_build_370.dm_build_337); err != nil {
+		dm_build_730.dm_build_699.Dm_build_377(0)
+		if _, err := dm_build_730.dm_build_699.Dm_build_396(dm_build_730.dm_build_697); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (dm_build_375 *dm_build_336) dm_build_374(dm_build_376 dm_build_742) (err error) {
+func (dm_build_735 *dm_build_696) dm_build_734(dm_build_736 dm_build_1110) (err error) {
 	defer func() {
 		if p := recover(); p != nil {
 			if _, ok := p.(string); ok {
@@ -187,495 +187,520 @@ func (dm_build_375 *dm_build_336) dm_build_374(dm_build_376 dm_build_742) (err e
 		}
 	}()
 
-	dm_build_378 := int32(0)
-	if dm_build_375.dm_build_604(dm_build_376) {
-		if dm_build_375.dm_build_338 != nil {
-			dm_build_375.dm_build_339.Dm_build_14(0)
-			if _, err := dm_build_375.dm_build_339.Dm_build_30(dm_build_375.dm_build_338, Dm_build_650); err != nil {
+	dm_build_738 := int32(0)
+	if dm_build_735.dm_build_972(dm_build_736) {
+		if dm_build_735.dm_build_698 != nil {
+			dm_build_735.dm_build_699.Dm_build_374(0)
+			if _, err := dm_build_735.dm_build_699.Dm_build_390(dm_build_735.dm_build_698, Dm_build_1018); err != nil {
 				return err
 			}
 
-			dm_build_378 = dm_build_376.dm_build_755()
-			if dm_build_378 > 0 {
-				if _, err := dm_build_375.dm_build_339.Dm_build_30(dm_build_375.dm_build_338, int(dm_build_378)); err != nil {
+			dm_build_738 = dm_build_736.dm_build_1123()
+			if dm_build_738 > 0 {
+				if _, err := dm_build_735.dm_build_699.Dm_build_390(dm_build_735.dm_build_698, int(dm_build_738)); err != nil {
 					return err
 				}
 			}
 		}
 	} else {
 
-		dm_build_375.dm_build_339.Dm_build_14(0)
-		if _, err := dm_build_375.dm_build_339.Dm_build_30(dm_build_375.dm_build_337, Dm_build_650); err != nil {
+		dm_build_735.dm_build_699.Dm_build_374(0)
+		if _, err := dm_build_735.dm_build_699.Dm_build_390(dm_build_735.dm_build_697, Dm_build_1018); err != nil {
 			return err
 		}
-		dm_build_378 = dm_build_376.dm_build_755()
+		dm_build_738 = dm_build_736.dm_build_1123()
 
-		if dm_build_378 > 0 {
-			if _, err := dm_build_375.dm_build_339.Dm_build_30(dm_build_375.dm_build_337, int(dm_build_378)); err != nil {
+		if dm_build_738 > 0 {
+			if _, err := dm_build_735.dm_build_699.Dm_build_390(dm_build_735.dm_build_697, int(dm_build_738)); err != nil {
 				return err
 			}
 		}
 	}
 
-	dm_build_376.dm_build_752()
+	dm_build_736.dm_build_1120()
 
-	dm_build_378 = dm_build_376.dm_build_755()
-	if dm_build_378 <= 0 {
+	dm_build_738 = dm_build_736.dm_build_1123()
+	if dm_build_738 <= 0 {
 		return nil
 	}
 
-	if dm_build_375.dm_build_343 {
-		ebytes := dm_build_375.dm_build_339.Dm_build_294(Dm_build_650, int(dm_build_378))
-		bytes, err := dm_build_375.dm_build_341.Decrypt(ebytes, true)
+	if dm_build_735.dm_build_703 {
+		ebytes := dm_build_735.dm_build_699.Dm_build_654(Dm_build_1018, int(dm_build_738))
+		bytes, err := dm_build_735.dm_build_701.Decrypt(ebytes, true)
 		if err != nil {
 			return err
 		}
-		dm_build_375.dm_build_339.Dm_build_14(Dm_build_650)
-		dm_build_375.dm_build_339.Dm_build_83(bytes)
-		dm_build_376.dm_build_756(int32(len(bytes)))
+		dm_build_735.dm_build_699.Dm_build_374(Dm_build_1018)
+		dm_build_735.dm_build_699.Dm_build_443(bytes)
+		dm_build_736.dm_build_1124(int32(len(bytes)))
 	}
 
-	if dm_build_375.dm_build_365(dm_build_376) {
+	if dm_build_735.dm_build_725(dm_build_736) {
 
-		dm_build_378 = dm_build_376.dm_build_755()
-		cbytes := dm_build_375.dm_build_339.Dm_build_294(Dm_build_650+ULINT_SIZE, int(dm_build_378-ULINT_SIZE))
-		bytes, err := UnCompress(cbytes, int(dm_build_375.dm_build_340.dmConnector.compressID))
+		dm_build_738 = dm_build_736.dm_build_1123()
+		cbytes := dm_build_735.dm_build_699.Dm_build_654(Dm_build_1018+ULINT_SIZE, int(dm_build_738-ULINT_SIZE))
+		bytes, err := UnCompress(cbytes, int(dm_build_735.dm_build_700.dmConnector.compressID))
 		if err != nil {
 			return err
 		}
-		dm_build_375.dm_build_339.Dm_build_14(Dm_build_650)
-		dm_build_375.dm_build_339.Dm_build_83(bytes)
-		dm_build_376.dm_build_756(int32(len(bytes)))
+		dm_build_735.dm_build_699.Dm_build_374(Dm_build_1018)
+		dm_build_735.dm_build_699.Dm_build_443(bytes)
+		dm_build_736.dm_build_1124(int32(len(bytes)))
 	}
 	return nil
 }
 
-func (dm_build_380 *dm_build_336) dm_build_379(dm_build_381 dm_build_742) (dm_build_382 interface{}, dm_build_383 error) {
-	if dm_build_380.dm_build_347 {
+func (dm_build_740 *dm_build_696) dm_build_739(dm_build_741 dm_build_1110) (dm_build_742 interface{}, dm_build_743 error) {
+	if dm_build_740.dm_build_707 {
 		return nil, ECGO_CONNECTION_CLOSED.throw()
 	}
-	dm_build_384 := dm_build_380.dm_build_340
-	dm_build_384.mu.Lock()
-	defer dm_build_384.mu.Unlock()
-	dm_build_383 = dm_build_381.dm_build_746(dm_build_381)
-	if dm_build_383 != nil {
-		return nil, dm_build_383
+	dm_build_744 := dm_build_740.dm_build_700
+	dm_build_744.mu.Lock()
+	defer dm_build_744.mu.Unlock()
+	dm_build_743 = dm_build_741.dm_build_1114(dm_build_741)
+	if dm_build_743 != nil {
+		return nil, dm_build_743
 	}
 
-	dm_build_383 = dm_build_380.dm_build_369(dm_build_381)
-	if dm_build_383 != nil {
-		return nil, dm_build_383
+	dm_build_743 = dm_build_740.dm_build_729(dm_build_741)
+	if dm_build_743 != nil {
+		return nil, dm_build_743
 	}
 
-	dm_build_383 = dm_build_380.dm_build_374(dm_build_381)
-	if dm_build_383 != nil {
-		return nil, dm_build_383
+	dm_build_743 = dm_build_740.dm_build_734(dm_build_741)
+	if dm_build_743 != nil {
+		return nil, dm_build_743
 	}
 
-	return dm_build_381.dm_build_750(dm_build_381)
+	return dm_build_741.dm_build_1118(dm_build_741)
 }
 
-func (dm_build_386 *dm_build_336) dm_build_385() (*dm_build_1199, error) {
+func (dm_build_746 *dm_build_696) dm_build_745() (*dm_build_1567, error) {
 
-	Dm_build_387 := dm_build_1205(dm_build_386)
-	_, dm_build_388 := dm_build_386.dm_build_379(Dm_build_387)
-	if dm_build_388 != nil {
-		return nil, dm_build_388
+	Dm_build_747 := dm_build_1573(dm_build_746)
+	_, dm_build_748 := dm_build_746.dm_build_739(Dm_build_747)
+	if dm_build_748 != nil {
+		return nil, dm_build_748
 	}
 
-	return Dm_build_387, nil
+	return Dm_build_747, nil
 }
 
-func (dm_build_390 *dm_build_336) dm_build_389() error {
+func (dm_build_750 *dm_build_696) dm_build_749() error {
 
-	dm_build_391 := dm_build_1066(dm_build_390)
-	_, dm_build_392 := dm_build_390.dm_build_379(dm_build_391)
-	if dm_build_392 != nil {
-		return dm_build_392
+	dm_build_751 := dm_build_1434(dm_build_750)
+	_, dm_build_752 := dm_build_750.dm_build_739(dm_build_751)
+	if dm_build_752 != nil {
+		return dm_build_752
 	}
 
 	return nil
 }
 
-func (dm_build_394 *dm_build_336) dm_build_393() error {
+func (dm_build_754 *dm_build_696) dm_build_753() error {
 
-	var dm_build_395 *dm_build_1199
+	var dm_build_755 *dm_build_1567
 	var err error
-	if dm_build_395, err = dm_build_394.dm_build_385(); err != nil {
+	if dm_build_755, err = dm_build_754.dm_build_745(); err != nil {
 		return err
 	}
 
-	if dm_build_394.dm_build_340.sslEncrypt == 2 {
-		if err = dm_build_394.dm_build_600(false); err != nil {
+	if dm_build_754.dm_build_700.sslEncrypt == 2 {
+		if err = dm_build_754.dm_build_968(false); err != nil {
 			return ECGO_INIT_SSL_FAILED.addDetail("\n" + err.Error()).throw()
 		}
-	} else if dm_build_394.dm_build_340.sslEncrypt == 1 {
-		if err = dm_build_394.dm_build_600(true); err != nil {
+	} else if dm_build_754.dm_build_700.sslEncrypt == 1 {
+		if err = dm_build_754.dm_build_968(true); err != nil {
 			return ECGO_INIT_SSL_FAILED.addDetail("\n" + err.Error()).throw()
 		}
 	}
 
-	if dm_build_394.dm_build_343 || dm_build_394.dm_build_342 {
-		k, err := dm_build_394.dm_build_590()
+	if dm_build_754.dm_build_703 || dm_build_754.dm_build_702 {
+		k, err := dm_build_754.dm_build_958()
 		if err != nil {
 			return err
 		}
-		sessionKey := security.ComputeSessionKey(k, dm_build_395.Dm_build_1203)
-		encryptType := dm_build_395.dm_build_1201
-		hashType := int(dm_build_395.Dm_build_1202)
+		sessionKey := security.ComputeSessionKey(k, dm_build_755.Dm_build_1571)
+		encryptType := dm_build_755.dm_build_1569
+		hashType := int(dm_build_755.Dm_build_1570)
 		if encryptType == -1 {
 			encryptType = security.DES_CFB
 		}
 		if hashType == -1 {
 			hashType = security.MD5
 		}
-		err = dm_build_394.dm_build_593(encryptType, sessionKey, dm_build_394.dm_build_340.dmConnector.cipherPath, hashType)
+		err = dm_build_754.dm_build_961(encryptType, sessionKey, dm_build_754.dm_build_700.dmConnector.cipherPath, hashType)
 		if err != nil {
 			return err
 		}
 	}
 
-	if err := dm_build_394.dm_build_389(); err != nil {
+	if err := dm_build_754.dm_build_749(); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (dm_build_398 *dm_build_336) Dm_build_397(dm_build_399 *DmStatement) error {
-	dm_build_400 := dm_build_1228(dm_build_398, dm_build_399)
-	_, dm_build_401 := dm_build_398.dm_build_379(dm_build_400)
-	if dm_build_401 != nil {
-		return dm_build_401
+func (dm_build_758 *dm_build_696) Dm_build_757(dm_build_759 *DmStatement) error {
+	dm_build_760 := dm_build_1596(dm_build_758, dm_build_759)
+	_, dm_build_761 := dm_build_758.dm_build_739(dm_build_760)
+	if dm_build_761 != nil {
+		return dm_build_761
 	}
 
 	return nil
 }
 
-func (dm_build_403 *dm_build_336) Dm_build_402(dm_build_404 int32) error {
-	dm_build_405 := dm_build_1238(dm_build_403, dm_build_404)
-	_, dm_build_406 := dm_build_403.dm_build_379(dm_build_405)
-	if dm_build_406 != nil {
-		return dm_build_406
+func (dm_build_763 *dm_build_696) Dm_build_762(dm_build_764 int32) error {
+	dm_build_765 := dm_build_1606(dm_build_763, dm_build_764)
+	_, dm_build_766 := dm_build_763.dm_build_739(dm_build_765)
+	if dm_build_766 != nil {
+		return dm_build_766
 	}
 
 	return nil
 }
 
-func (dm_build_408 *dm_build_336) Dm_build_407(dm_build_409 *DmStatement, dm_build_410 bool, dm_build_411 int16) (*execRetInfo, error) {
-	dm_build_412 := dm_build_1105(dm_build_408, dm_build_409, dm_build_410, dm_build_411)
-	dm_build_413, dm_build_414 := dm_build_408.dm_build_379(dm_build_412)
-	if dm_build_414 != nil {
-		return nil, dm_build_414
+func (dm_build_768 *dm_build_696) Dm_build_767(dm_build_769 *DmStatement, dm_build_770 bool, dm_build_771 int16) (*execRetInfo, error) {
+	dm_build_772 := dm_build_1473(dm_build_768, dm_build_769, dm_build_770, dm_build_771)
+	dm_build_773, dm_build_774 := dm_build_768.dm_build_739(dm_build_772)
+	if dm_build_774 != nil {
+		return nil, dm_build_774
 	}
-	return dm_build_413.(*execRetInfo), nil
+	return dm_build_773.(*execRetInfo), nil
 }
 
-func (dm_build_416 *dm_build_336) Dm_build_415(dm_build_417 *DmStatement, dm_build_418 int16) (*execRetInfo, error) {
-	return dm_build_416.Dm_build_407(dm_build_417, false, Dm_build_702)
+func (dm_build_776 *dm_build_696) Dm_build_775(dm_build_777 *DmStatement, dm_build_778 int16) (*execRetInfo, error) {
+	return dm_build_776.Dm_build_767(dm_build_777, false, Dm_build_1070)
 }
 
-func (dm_build_420 *dm_build_336) Dm_build_419(dm_build_421 *DmStatement, dm_build_422 []OptParameter) (*execRetInfo, error) {
-	dm_build_423, dm_build_424 := dm_build_420.dm_build_379(dm_build_845(dm_build_420, dm_build_421, dm_build_422))
-	if dm_build_424 != nil {
-		return nil, dm_build_424
+func (dm_build_780 *dm_build_696) Dm_build_779(dm_build_781 *DmStatement, dm_build_782 []OptParameter) (*execRetInfo, error) {
+	dm_build_783, dm_build_784 := dm_build_780.dm_build_739(dm_build_1213(dm_build_780, dm_build_781, dm_build_782))
+	if dm_build_784 != nil {
+		return nil, dm_build_784
 	}
 
-	return dm_build_423.(*execRetInfo), nil
+	return dm_build_783.(*execRetInfo), nil
 }
 
-func (dm_build_426 *dm_build_336) Dm_build_425(dm_build_427 *DmStatement, dm_build_428 int16) (*execRetInfo, error) {
-	return dm_build_426.Dm_build_407(dm_build_427, true, dm_build_428)
+func (dm_build_786 *dm_build_696) Dm_build_785(dm_build_787 *DmStatement, dm_build_788 int16) (*execRetInfo, error) {
+	return dm_build_786.Dm_build_767(dm_build_787, true, dm_build_788)
 }
 
-func (dm_build_430 *dm_build_336) Dm_build_429(dm_build_431 *DmStatement, dm_build_432 [][]interface{}) (*execRetInfo, error) {
-	dm_build_433 := dm_build_877(dm_build_430, dm_build_431, dm_build_432)
-	dm_build_434, dm_build_435 := dm_build_430.dm_build_379(dm_build_433)
-	if dm_build_435 != nil {
-		return nil, dm_build_435
+func (dm_build_790 *dm_build_696) Dm_build_789(dm_build_791 *DmStatement, dm_build_792 [][]interface{}) (*execRetInfo, error) {
+	dm_build_793 := dm_build_1245(dm_build_790, dm_build_791, dm_build_792)
+	dm_build_794, dm_build_795 := dm_build_790.dm_build_739(dm_build_793)
+	if dm_build_795 != nil {
+		return nil, dm_build_795
 	}
-	return dm_build_434.(*execRetInfo), nil
+	return dm_build_794.(*execRetInfo), nil
 }
 
-func (dm_build_437 *dm_build_336) Dm_build_436(dm_build_438 *DmStatement, dm_build_439 [][]interface{}, dm_build_440 bool) (*execRetInfo, error) {
-	var dm_build_441, dm_build_442 = 0, 0
-	var dm_build_443 = len(dm_build_439)
-	var dm_build_444 [][]interface{}
-	var dm_build_445 = NewExceInfo()
-	dm_build_445.updateCounts = make([]int64, dm_build_443)
-	var dm_build_446 = false
-	for dm_build_441 < dm_build_443 {
-		for dm_build_442 = dm_build_441; dm_build_442 < dm_build_443; dm_build_442++ {
-			paramData := dm_build_439[dm_build_442]
-			bindData := make([]interface{}, dm_build_438.paramCount)
-			dm_build_446 = false
-			for icol := 0; icol < int(dm_build_438.paramCount); icol++ {
-				if dm_build_438.bindParams[icol].ioType == IO_TYPE_OUT {
+func (dm_build_797 *dm_build_696) Dm_build_796(dm_build_798 *DmStatement, dm_build_799 [][]interface{}, dm_build_800 bool) (*execRetInfo, error) {
+	var dm_build_801, dm_build_802 = 0, 0
+	var dm_build_803 = len(dm_build_799)
+	var dm_build_804 [][]interface{}
+	var dm_build_805 = NewExceInfo()
+	dm_build_805.updateCounts = make([]int64, dm_build_803)
+	var dm_build_806 = false
+	for dm_build_801 < dm_build_803 {
+		for dm_build_802 = dm_build_801; dm_build_802 < dm_build_803; dm_build_802++ {
+			paramData := dm_build_799[dm_build_802]
+			bindData := make([]interface{}, dm_build_798.paramCount)
+			dm_build_806 = false
+			for icol := 0; icol < int(dm_build_798.paramCount); icol++ {
+				if dm_build_798.bindParams[icol].ioType == IO_TYPE_OUT {
 					continue
 				}
-				if dm_build_437.dm_build_573(bindData, paramData, icol) {
-					dm_build_446 = true
+				if dm_build_797.dm_build_941(bindData, paramData, icol) {
+					dm_build_806 = true
 					break
 				}
 			}
 
-			if dm_build_446 {
+			if dm_build_806 {
 				break
 			}
-			dm_build_444 = append(dm_build_444, bindData)
+			dm_build_804 = append(dm_build_804, bindData)
 		}
 
-		if dm_build_442 != dm_build_441 {
-			tmpExecInfo, err := dm_build_437.Dm_build_429(dm_build_438, dm_build_444)
+		if dm_build_802 != dm_build_801 {
+			tmpExecInfo, err := dm_build_797.Dm_build_789(dm_build_798, dm_build_804)
 			if err != nil {
 				return nil, err
 			}
-			dm_build_444 = dm_build_444[0:0]
-			dm_build_445.union(tmpExecInfo, dm_build_441, dm_build_442-dm_build_441)
+			dm_build_804 = dm_build_804[0:0]
+			dm_build_805.union(tmpExecInfo, dm_build_801, dm_build_802-dm_build_801)
 		}
 
-		if dm_build_442 < dm_build_443 {
-			tmpExecInfo, err := dm_build_437.Dm_build_447(dm_build_438, dm_build_439[dm_build_442], dm_build_440)
+		if dm_build_802 < dm_build_803 {
+			tmpExecInfo, err := dm_build_797.Dm_build_815(dm_build_798, dm_build_799[dm_build_802], dm_build_800)
 			if err != nil {
 				return nil, err
 			}
 
-			dm_build_440 = true
-			dm_build_445.union(tmpExecInfo, dm_build_442, 1)
+			dm_build_800 = true
+			dm_build_805.union(tmpExecInfo, dm_build_802, 1)
 		}
 
-		dm_build_441 = dm_build_442 + 1
+		dm_build_801 = dm_build_802 + 1
 	}
-	for _, i := range dm_build_445.updateCounts {
+	for _, i := range dm_build_805.updateCounts {
 		if i > 0 {
-			dm_build_445.updateCount += i
+			dm_build_805.updateCount += i
 		}
 	}
-	return dm_build_445, nil
+	return dm_build_805, nil
 }
 
-func (dm_build_448 *dm_build_336) Dm_build_447(dm_build_449 *DmStatement, dm_build_450 []interface{}, dm_build_451 bool) (*execRetInfo, error) {
+func (dm_build_808 *dm_build_696) dm_build_807(dm_build_809 *DmStatement, dm_build_810 []parameter) error {
+	if !dm_build_809.prepared {
+		retInfo, err := dm_build_808.Dm_build_767(dm_build_809, false, Dm_build_1070)
+		if err != nil {
+			return nil
+		}
+		dm_build_809.serverParams = retInfo.serverParams
+		dm_build_809.paramCount = int32(len(dm_build_809.serverParams))
+		dm_build_809.prepared = true
+	}
 
-	var dm_build_452 = make([]interface{}, dm_build_449.paramCount)
-	for icol := 0; icol < int(dm_build_449.paramCount); icol++ {
-		if dm_build_449.bindParams[icol].ioType == IO_TYPE_OUT {
+	dm_build_811 := dm_build_1462(dm_build_808, dm_build_809, dm_build_809.bindParams)
+	dm_build_812, err := dm_build_808.dm_build_739(dm_build_811)
+	if err != nil {
+		return nil
+	}
+	retInfo := dm_build_812.(*execRetInfo)
+	if retInfo.serverParams != nil && len(retInfo.serverParams) > 0 {
+		dm_build_809.serverParams = retInfo.serverParams
+		dm_build_809.paramCount = int32(len(dm_build_809.serverParams))
+	}
+	dm_build_809.preExec = true
+	return nil
+}
+
+func (dm_build_816 *dm_build_696) Dm_build_815(dm_build_817 *DmStatement, dm_build_818 []interface{}, dm_build_819 bool) (*execRetInfo, error) {
+
+	var dm_build_820 = make([]interface{}, dm_build_817.paramCount)
+	for icol := 0; icol < int(dm_build_817.paramCount); icol++ {
+		if dm_build_817.bindParams[icol].ioType == IO_TYPE_OUT {
 			continue
 		}
-		if dm_build_448.dm_build_573(dm_build_452, dm_build_450, icol) {
+		if dm_build_816.dm_build_941(dm_build_820, dm_build_818, icol) {
 
-			if !dm_build_451 {
-				preExecute := dm_build_1094(dm_build_448, dm_build_449, dm_build_449.bindParams)
-				dm_build_448.dm_build_379(preExecute)
-				dm_build_451 = true
+			if !dm_build_819 {
+				dm_build_816.dm_build_807(dm_build_817, dm_build_817.bindParams)
+
+				dm_build_819 = true
 			}
 
-			dm_build_448.dm_build_579(dm_build_449, dm_build_449.bindParams[icol], icol, dm_build_450[icol].(iOffRowBinder))
-			dm_build_452[icol] = ParamDataEnum_OFF_ROW
+			dm_build_816.dm_build_947(dm_build_817, dm_build_817.bindParams[icol], icol, dm_build_818[icol].(iOffRowBinder))
+			dm_build_820[icol] = ParamDataEnum_OFF_ROW
 		}
 	}
 
-	var dm_build_453 = make([][]interface{}, 1, 1)
-	dm_build_453[0] = dm_build_452
+	var dm_build_821 = make([][]interface{}, 1, 1)
+	dm_build_821[0] = dm_build_820
 
-	dm_build_454 := dm_build_877(dm_build_448, dm_build_449, dm_build_453)
-	dm_build_455, dm_build_456 := dm_build_448.dm_build_379(dm_build_454)
-	if dm_build_456 != nil {
-		return nil, dm_build_456
+	dm_build_822 := dm_build_1245(dm_build_816, dm_build_817, dm_build_821)
+	dm_build_823, dm_build_824 := dm_build_816.dm_build_739(dm_build_822)
+	if dm_build_824 != nil {
+		return nil, dm_build_824
 	}
-	return dm_build_455.(*execRetInfo), nil
+	return dm_build_823.(*execRetInfo), nil
 }
 
-func (dm_build_458 *dm_build_336) Dm_build_457(dm_build_459 *DmStatement, dm_build_460 int16) (*execRetInfo, error) {
-	dm_build_461 := dm_build_1081(dm_build_458, dm_build_459, dm_build_460)
+func (dm_build_826 *dm_build_696) Dm_build_825(dm_build_827 *DmStatement, dm_build_828 int16) (*execRetInfo, error) {
+	dm_build_829 := dm_build_1449(dm_build_826, dm_build_827, dm_build_828)
 
-	dm_build_462, dm_build_463 := dm_build_458.dm_build_379(dm_build_461)
-	if dm_build_463 != nil {
-		return nil, dm_build_463
+	dm_build_830, dm_build_831 := dm_build_826.dm_build_739(dm_build_829)
+	if dm_build_831 != nil {
+		return nil, dm_build_831
 	}
-	return dm_build_462.(*execRetInfo), nil
+	return dm_build_830.(*execRetInfo), nil
 }
 
-func (dm_build_465 *dm_build_336) Dm_build_464(dm_build_466 *innerRows, dm_build_467 int64) (*execRetInfo, error) {
-	dm_build_468 := dm_build_984(dm_build_465, dm_build_466, dm_build_467, INT64_MAX)
-	dm_build_469, dm_build_470 := dm_build_465.dm_build_379(dm_build_468)
-	if dm_build_470 != nil {
-		return nil, dm_build_470
+func (dm_build_833 *dm_build_696) Dm_build_832(dm_build_834 *innerRows, dm_build_835 int64) (*execRetInfo, error) {
+	dm_build_836 := dm_build_1352(dm_build_833, dm_build_834, dm_build_835, INT64_MAX)
+	dm_build_837, dm_build_838 := dm_build_833.dm_build_739(dm_build_836)
+	if dm_build_838 != nil {
+		return nil, dm_build_838
 	}
-	return dm_build_469.(*execRetInfo), nil
+	return dm_build_837.(*execRetInfo), nil
 }
 
-func (dm_build_472 *dm_build_336) Commit() error {
-	dm_build_473 := dm_build_830(dm_build_472)
-	_, dm_build_474 := dm_build_472.dm_build_379(dm_build_473)
-	if dm_build_474 != nil {
-		return dm_build_474
-	}
-
-	return nil
-}
-
-func (dm_build_476 *dm_build_336) Rollback() error {
-	dm_build_477 := dm_build_1143(dm_build_476)
-	_, dm_build_478 := dm_build_476.dm_build_379(dm_build_477)
-	if dm_build_478 != nil {
-		return dm_build_478
+func (dm_build_840 *dm_build_696) Commit() error {
+	dm_build_841 := dm_build_1198(dm_build_840)
+	_, dm_build_842 := dm_build_840.dm_build_739(dm_build_841)
+	if dm_build_842 != nil {
+		return dm_build_842
 	}
 
 	return nil
 }
 
-func (dm_build_480 *dm_build_336) Dm_build_479(dm_build_481 *DmConnection) error {
-	dm_build_482 := dm_build_1148(dm_build_480, dm_build_481.IsoLevel)
-	_, dm_build_483 := dm_build_480.dm_build_379(dm_build_482)
-	if dm_build_483 != nil {
-		return dm_build_483
+func (dm_build_844 *dm_build_696) Rollback() error {
+	dm_build_845 := dm_build_1511(dm_build_844)
+	_, dm_build_846 := dm_build_844.dm_build_739(dm_build_845)
+	if dm_build_846 != nil {
+		return dm_build_846
 	}
 
 	return nil
 }
 
-func (dm_build_485 *dm_build_336) Dm_build_484(dm_build_486 *DmStatement, dm_build_487 string) error {
-	dm_build_488 := dm_build_835(dm_build_485, dm_build_486, dm_build_487)
-	_, dm_build_489 := dm_build_485.dm_build_379(dm_build_488)
-	if dm_build_489 != nil {
-		return dm_build_489
+func (dm_build_848 *dm_build_696) Dm_build_847(dm_build_849 *DmConnection) error {
+	dm_build_850 := dm_build_1516(dm_build_848, dm_build_849.IsoLevel)
+	_, dm_build_851 := dm_build_848.dm_build_739(dm_build_850)
+	if dm_build_851 != nil {
+		return dm_build_851
 	}
 
 	return nil
 }
 
-func (dm_build_491 *dm_build_336) Dm_build_490(dm_build_492 []uint32) ([]int64, error) {
-	dm_build_493 := dm_build_1246(dm_build_491, dm_build_492)
-	dm_build_494, dm_build_495 := dm_build_491.dm_build_379(dm_build_493)
-	if dm_build_495 != nil {
-		return nil, dm_build_495
+func (dm_build_853 *dm_build_696) Dm_build_852(dm_build_854 *DmStatement, dm_build_855 string) error {
+	dm_build_856 := dm_build_1203(dm_build_853, dm_build_854, dm_build_855)
+	_, dm_build_857 := dm_build_853.dm_build_739(dm_build_856)
+	if dm_build_857 != nil {
+		return dm_build_857
 	}
-	return dm_build_494.([]int64), nil
+
+	return nil
 }
 
-func (dm_build_497 *dm_build_336) Close() error {
-	if dm_build_497.dm_build_347 {
+func (dm_build_859 *dm_build_696) Dm_build_858(dm_build_860 []uint32) ([]int64, error) {
+	dm_build_861 := dm_build_1614(dm_build_859, dm_build_860)
+	dm_build_862, dm_build_863 := dm_build_859.dm_build_739(dm_build_861)
+	if dm_build_863 != nil {
+		return nil, dm_build_863
+	}
+	return dm_build_862.([]int64), nil
+}
+
+func (dm_build_865 *dm_build_696) Close() error {
+	if dm_build_865.dm_build_707 {
 		return nil
 	}
 
-	dm_build_498 := dm_build_497.dm_build_337.Close()
-	if dm_build_498 != nil {
-		return dm_build_498
+	dm_build_866 := dm_build_865.dm_build_697.Close()
+	if dm_build_866 != nil {
+		return dm_build_866
 	}
 
-	dm_build_497.dm_build_340 = nil
-	dm_build_497.dm_build_347 = true
+	dm_build_865.dm_build_700 = nil
+	dm_build_865.dm_build_707 = true
 	return nil
 }
 
-func (dm_build_500 *dm_build_336) dm_build_499(dm_build_501 *lob) (int64, error) {
-	dm_build_502 := dm_build_1017(dm_build_500, dm_build_501)
-	dm_build_503, dm_build_504 := dm_build_500.dm_build_379(dm_build_502)
-	if dm_build_504 != nil {
-		return 0, dm_build_504
+func (dm_build_868 *dm_build_696) dm_build_867(dm_build_869 *lob) (int64, error) {
+	dm_build_870 := dm_build_1385(dm_build_868, dm_build_869)
+	dm_build_871, dm_build_872 := dm_build_868.dm_build_739(dm_build_870)
+	if dm_build_872 != nil {
+		return 0, dm_build_872
 	}
-	return dm_build_503.(int64), nil
+	return dm_build_871.(int64), nil
 }
 
-func (dm_build_506 *dm_build_336) dm_build_505(dm_build_507 *lob, dm_build_508 int32, dm_build_509 int32) (*lobRetInfo, error) {
-	dm_build_510 := dm_build_1002(dm_build_506, dm_build_507, int(dm_build_508), int(dm_build_509))
-	dm_build_511, dm_build_512 := dm_build_506.dm_build_379(dm_build_510)
-	if dm_build_512 != nil {
-		return nil, dm_build_512
+func (dm_build_874 *dm_build_696) dm_build_873(dm_build_875 *lob, dm_build_876 int32, dm_build_877 int32) (*lobRetInfo, error) {
+	dm_build_878 := dm_build_1370(dm_build_874, dm_build_875, int(dm_build_876), int(dm_build_877))
+	dm_build_879, dm_build_880 := dm_build_874.dm_build_739(dm_build_878)
+	if dm_build_880 != nil {
+		return nil, dm_build_880
 	}
-	return dm_build_511.(*lobRetInfo), nil
+	return dm_build_879.(*lobRetInfo), nil
 }
 
-func (dm_build_514 *dm_build_336) dm_build_513(dm_build_515 *DmBlob, dm_build_516 int32, dm_build_517 int32) ([]byte, error) {
-	var dm_build_518 = make([]byte, dm_build_517)
-	var dm_build_519 int32 = 0
-	var dm_build_520 int32 = 0
-	var dm_build_521 *lobRetInfo
-	var dm_build_522 []byte
-	var dm_build_523 error
-	for dm_build_519 < dm_build_517 {
-		dm_build_520 = dm_build_517 - dm_build_519
-		if dm_build_520 > Dm_build_735 {
-			dm_build_520 = Dm_build_735
+func (dm_build_882 *dm_build_696) dm_build_881(dm_build_883 *DmBlob, dm_build_884 int32, dm_build_885 int32) ([]byte, error) {
+	var dm_build_886 = make([]byte, dm_build_885)
+	var dm_build_887 int32 = 0
+	var dm_build_888 int32 = 0
+	var dm_build_889 *lobRetInfo
+	var dm_build_890 []byte
+	var dm_build_891 error
+	for dm_build_887 < dm_build_885 {
+		dm_build_888 = dm_build_885 - dm_build_887
+		if dm_build_888 > Dm_build_1103 {
+			dm_build_888 = Dm_build_1103
 		}
-		dm_build_521, dm_build_523 = dm_build_514.dm_build_505(&dm_build_515.lob, dm_build_516+dm_build_519, dm_build_520)
-		if dm_build_523 != nil {
-			return nil, dm_build_523
+		dm_build_889, dm_build_891 = dm_build_882.dm_build_873(&dm_build_883.lob, dm_build_884+dm_build_887, dm_build_888)
+		if dm_build_891 != nil {
+			return nil, dm_build_891
 		}
-		dm_build_522 = dm_build_521.data
-		if dm_build_522 == nil || len(dm_build_522) == 0 {
+		dm_build_890 = dm_build_889.data
+		if dm_build_890 == nil || len(dm_build_890) == 0 {
 			break
 		}
-		Dm_build_1257.Dm_build_1313(dm_build_518, int(dm_build_519), dm_build_522, 0, len(dm_build_522))
-		dm_build_519 += int32(len(dm_build_522))
-		if dm_build_515.readOver {
+		Dm_build_1.Dm_build_57(dm_build_886, int(dm_build_887), dm_build_890, 0, len(dm_build_890))
+		dm_build_887 += int32(len(dm_build_890))
+		if dm_build_883.readOver {
 			break
 		}
 	}
-	return dm_build_518, nil
+	return dm_build_886, nil
 }
 
-func (dm_build_525 *dm_build_336) dm_build_524(dm_build_526 *DmClob, dm_build_527 int32, dm_build_528 int32) (string, error) {
-	var dm_build_529 bytes.Buffer
-	var dm_build_530 int32 = 0
-	var dm_build_531 int32 = 0
-	var dm_build_532 *lobRetInfo
-	var dm_build_533 []byte
-	var dm_build_534 string
-	var dm_build_535 error
-	for dm_build_530 < dm_build_528 {
-		dm_build_531 = dm_build_528 - dm_build_530
-		if dm_build_531 > Dm_build_735/2 {
-			dm_build_531 = Dm_build_735 / 2
+func (dm_build_893 *dm_build_696) dm_build_892(dm_build_894 *DmClob, dm_build_895 int32, dm_build_896 int32) (string, error) {
+	var dm_build_897 bytes.Buffer
+	var dm_build_898 int32 = 0
+	var dm_build_899 int32 = 0
+	var dm_build_900 *lobRetInfo
+	var dm_build_901 []byte
+	var dm_build_902 string
+	var dm_build_903 error
+	for dm_build_898 < dm_build_896 {
+		dm_build_899 = dm_build_896 - dm_build_898
+		if dm_build_899 > Dm_build_1103/2 {
+			dm_build_899 = Dm_build_1103 / 2
 		}
-		dm_build_532, dm_build_535 = dm_build_525.dm_build_505(&dm_build_526.lob, dm_build_527+dm_build_530, dm_build_531)
-		if dm_build_535 != nil {
-			return "", dm_build_535
+		dm_build_900, dm_build_903 = dm_build_893.dm_build_873(&dm_build_894.lob, dm_build_895+dm_build_898, dm_build_899)
+		if dm_build_903 != nil {
+			return "", dm_build_903
 		}
-		dm_build_533 = dm_build_532.data
-		if dm_build_533 == nil || len(dm_build_533) == 0 {
+		dm_build_901 = dm_build_900.data
+		if dm_build_901 == nil || len(dm_build_901) == 0 {
 			break
 		}
-		dm_build_534 = Dm_build_1257.Dm_build_1414(dm_build_533, 0, len(dm_build_533), dm_build_526.serverEncoding, dm_build_525.dm_build_340)
+		dm_build_902 = Dm_build_1.Dm_build_158(dm_build_901, 0, len(dm_build_901), dm_build_894.serverEncoding, dm_build_893.dm_build_700)
 
-		dm_build_529.WriteString(dm_build_534)
-		var strLen = dm_build_532.charLen
+		dm_build_897.WriteString(dm_build_902)
+		var strLen = dm_build_900.charLen
 		if strLen == -1 {
-			strLen = int64(utf8.RuneCountInString(dm_build_534))
+			strLen = int64(utf8.RuneCountInString(dm_build_902))
 		}
-		dm_build_530 += int32(strLen)
-		if dm_build_526.readOver {
+		dm_build_898 += int32(strLen)
+		if dm_build_894.readOver {
 			break
 		}
 	}
-	return dm_build_529.String(), nil
+	return dm_build_897.String(), nil
 }
 
-func (dm_build_537 *dm_build_336) dm_build_536(dm_build_538 *DmClob, dm_build_539 int, dm_build_540 string, dm_build_541 string) (int, error) {
-	var dm_build_542 = Dm_build_1257.Dm_build_1473(dm_build_540, dm_build_541, dm_build_537.dm_build_340)
-	var dm_build_543 = 0
-	var dm_build_544 = len(dm_build_542)
-	var dm_build_545 = 0
-	var dm_build_546 = 0
-	var dm_build_547 = 0
-	var dm_build_548 = dm_build_544/Dm_build_734 + 1
-	var dm_build_549 byte = 0
-	var dm_build_550 byte = 0x01
-	var dm_build_551 byte = 0x02
-	for i := 0; i < dm_build_548; i++ {
-		dm_build_549 = 0
+func (dm_build_905 *dm_build_696) dm_build_904(dm_build_906 *DmClob, dm_build_907 int, dm_build_908 string, dm_build_909 string) (int, error) {
+	var dm_build_910 = Dm_build_1.Dm_build_217(dm_build_908, dm_build_909, dm_build_905.dm_build_700)
+	var dm_build_911 = 0
+	var dm_build_912 = len(dm_build_910)
+	var dm_build_913 = 0
+	var dm_build_914 = 0
+	var dm_build_915 = 0
+	var dm_build_916 = dm_build_912/Dm_build_1102 + 1
+	var dm_build_917 byte = 0
+	var dm_build_918 byte = 0x01
+	var dm_build_919 byte = 0x02
+	for i := 0; i < dm_build_916; i++ {
+		dm_build_917 = 0
 		if i == 0 {
-			dm_build_549 |= dm_build_550
+			dm_build_917 |= dm_build_918
 		}
-		if i == dm_build_548-1 {
-			dm_build_549 |= dm_build_551
+		if i == dm_build_916-1 {
+			dm_build_917 |= dm_build_919
 		}
-		dm_build_547 = dm_build_544 - dm_build_546
-		if dm_build_547 > Dm_build_734 {
-			dm_build_547 = Dm_build_734
+		dm_build_915 = dm_build_912 - dm_build_914
+		if dm_build_915 > Dm_build_1102 {
+			dm_build_915 = Dm_build_1102
 		}
 
-		setLobData := dm_build_1162(dm_build_537, &dm_build_538.lob, dm_build_549, dm_build_539, dm_build_542, dm_build_543, dm_build_547)
-		ret, err := dm_build_537.dm_build_379(setLobData)
+		setLobData := dm_build_1530(dm_build_905, &dm_build_906.lob, dm_build_917, dm_build_907, dm_build_910, dm_build_911, dm_build_915)
+		ret, err := dm_build_905.dm_build_739(setLobData)
 		if err != nil {
 			return 0, err
 		}
@@ -684,106 +709,106 @@ func (dm_build_537 *dm_build_336) dm_build_536(dm_build_538 *DmClob, dm_build_53
 			return -1, err
 		}
 		if tmp <= 0 {
-			return dm_build_545, nil
+			return dm_build_913, nil
 		} else {
-			dm_build_539 += int(tmp)
-			dm_build_545 += int(tmp)
-			dm_build_546 += dm_build_547
-			dm_build_543 += dm_build_547
+			dm_build_907 += int(tmp)
+			dm_build_913 += int(tmp)
+			dm_build_914 += dm_build_915
+			dm_build_911 += dm_build_915
 		}
 	}
-	return dm_build_545, nil
+	return dm_build_913, nil
 }
 
-func (dm_build_553 *dm_build_336) dm_build_552(dm_build_554 *DmBlob, dm_build_555 int, dm_build_556 []byte) (int, error) {
-	var dm_build_557 = 0
-	var dm_build_558 = len(dm_build_556)
-	var dm_build_559 = 0
-	var dm_build_560 = 0
-	var dm_build_561 = 0
-	var dm_build_562 = dm_build_558/Dm_build_734 + 1
-	var dm_build_563 byte = 0
-	var dm_build_564 byte = 0x01
-	var dm_build_565 byte = 0x02
-	for i := 0; i < dm_build_562; i++ {
-		dm_build_563 = 0
+func (dm_build_921 *dm_build_696) dm_build_920(dm_build_922 *DmBlob, dm_build_923 int, dm_build_924 []byte) (int, error) {
+	var dm_build_925 = 0
+	var dm_build_926 = len(dm_build_924)
+	var dm_build_927 = 0
+	var dm_build_928 = 0
+	var dm_build_929 = 0
+	var dm_build_930 = dm_build_926/Dm_build_1102 + 1
+	var dm_build_931 byte = 0
+	var dm_build_932 byte = 0x01
+	var dm_build_933 byte = 0x02
+	for i := 0; i < dm_build_930; i++ {
+		dm_build_931 = 0
 		if i == 0 {
-			dm_build_563 |= dm_build_564
+			dm_build_931 |= dm_build_932
 		}
-		if i == dm_build_562-1 {
-			dm_build_563 |= dm_build_565
+		if i == dm_build_930-1 {
+			dm_build_931 |= dm_build_933
 		}
-		dm_build_561 = dm_build_558 - dm_build_560
-		if dm_build_561 > Dm_build_734 {
-			dm_build_561 = Dm_build_734
+		dm_build_929 = dm_build_926 - dm_build_928
+		if dm_build_929 > Dm_build_1102 {
+			dm_build_929 = Dm_build_1102
 		}
 
-		setLobData := dm_build_1162(dm_build_553, &dm_build_554.lob, dm_build_563, dm_build_555, dm_build_556, dm_build_557, dm_build_561)
-		ret, err := dm_build_553.dm_build_379(setLobData)
+		setLobData := dm_build_1530(dm_build_921, &dm_build_922.lob, dm_build_931, dm_build_923, dm_build_924, dm_build_925, dm_build_929)
+		ret, err := dm_build_921.dm_build_739(setLobData)
 		if err != nil {
 			return 0, err
 		}
 		tmp := ret.(int32)
 		if tmp <= 0 {
-			return dm_build_559, nil
+			return dm_build_927, nil
 		} else {
-			dm_build_555 += int(tmp)
-			dm_build_559 += int(tmp)
-			dm_build_560 += dm_build_561
-			dm_build_557 += dm_build_561
+			dm_build_923 += int(tmp)
+			dm_build_927 += int(tmp)
+			dm_build_928 += dm_build_929
+			dm_build_925 += dm_build_929
 		}
 	}
-	return dm_build_559, nil
+	return dm_build_927, nil
 }
 
-func (dm_build_567 *dm_build_336) dm_build_566(dm_build_568 *lob, dm_build_569 int) (int64, error) {
-	dm_build_570 := dm_build_1028(dm_build_567, dm_build_568, dm_build_569)
-	dm_build_571, dm_build_572 := dm_build_567.dm_build_379(dm_build_570)
-	if dm_build_572 != nil {
-		return dm_build_568.length, dm_build_572
+func (dm_build_935 *dm_build_696) dm_build_934(dm_build_936 *lob, dm_build_937 int) (int64, error) {
+	dm_build_938 := dm_build_1396(dm_build_935, dm_build_936, dm_build_937)
+	dm_build_939, dm_build_940 := dm_build_935.dm_build_739(dm_build_938)
+	if dm_build_940 != nil {
+		return dm_build_936.length, dm_build_940
 	}
-	return dm_build_571.(int64), nil
+	return dm_build_939.(int64), nil
 }
 
-func (dm_build_574 *dm_build_336) dm_build_573(dm_build_575 []interface{}, dm_build_576 []interface{}, dm_build_577 int) bool {
-	var dm_build_578 = false
-	dm_build_575[dm_build_577] = dm_build_576[dm_build_577]
+func (dm_build_942 *dm_build_696) dm_build_941(dm_build_943 []interface{}, dm_build_944 []interface{}, dm_build_945 int) bool {
+	var dm_build_946 = false
+	dm_build_943[dm_build_945] = dm_build_944[dm_build_945]
 
-	if binder, ok := dm_build_576[dm_build_577].(iOffRowBinder); ok {
-		dm_build_578 = true
-		dm_build_575[dm_build_577] = make([]byte, 0)
+	if binder, ok := dm_build_944[dm_build_945].(iOffRowBinder); ok {
+		dm_build_946 = true
+		dm_build_943[dm_build_945] = make([]byte, 0)
 		var lob lob
 		if l, ok := binder.getObj().(DmBlob); ok {
 			lob = l.lob
 		} else if l, ok := binder.getObj().(DmClob); ok {
 			lob = l.lob
 		}
-		if &lob != nil && lob.canOptimized(dm_build_574.dm_build_340) {
-			dm_build_575[dm_build_577] = &lobCtl{lob.buildCtlData()}
-			dm_build_578 = false
+		if &lob != nil && lob.canOptimized(dm_build_942.dm_build_700) {
+			dm_build_943[dm_build_945] = &lobCtl{lob.buildCtlData()}
+			dm_build_946 = false
 		}
 	} else {
-		dm_build_575[dm_build_577] = dm_build_576[dm_build_577]
+		dm_build_943[dm_build_945] = dm_build_944[dm_build_945]
 	}
-	return dm_build_578
+	return dm_build_946
 }
 
-func (dm_build_580 *dm_build_336) dm_build_579(dm_build_581 *DmStatement, dm_build_582 parameter, dm_build_583 int, dm_build_584 iOffRowBinder) error {
-	var dm_build_585 = Dm_build_1542()
-	dm_build_584.read(dm_build_585)
-	var dm_build_586 = 0
-	for !dm_build_584.isReadOver() || dm_build_585.Dm_build_1543() > 0 {
-		if !dm_build_584.isReadOver() && dm_build_585.Dm_build_1543() < Dm_build_734 {
-			dm_build_584.read(dm_build_585)
+func (dm_build_948 *dm_build_696) dm_build_947(dm_build_949 *DmStatement, dm_build_950 parameter, dm_build_951 int, dm_build_952 iOffRowBinder) error {
+	var dm_build_953 = Dm_build_286()
+	dm_build_952.read(dm_build_953)
+	var dm_build_954 = 0
+	for !dm_build_952.isReadOver() || dm_build_953.Dm_build_287() > 0 {
+		if !dm_build_952.isReadOver() && dm_build_953.Dm_build_287() < Dm_build_1102 {
+			dm_build_952.read(dm_build_953)
 		}
-		if dm_build_585.Dm_build_1543() > Dm_build_734 {
-			dm_build_586 = Dm_build_734
+		if dm_build_953.Dm_build_287() > Dm_build_1102 {
+			dm_build_954 = Dm_build_1102
 		} else {
-			dm_build_586 = dm_build_585.Dm_build_1543()
+			dm_build_954 = dm_build_953.Dm_build_287()
 		}
 
-		putData := dm_build_1133(dm_build_580, dm_build_581, int16(dm_build_583), dm_build_585, int32(dm_build_586))
-		_, err := dm_build_580.dm_build_379(putData)
+		putData := dm_build_1501(dm_build_948, dm_build_949, int16(dm_build_951), dm_build_953, int32(dm_build_954))
+		_, err := dm_build_948.dm_build_739(putData)
 		if err != nil {
 			return err
 		}
@@ -791,47 +816,47 @@ func (dm_build_580 *dm_build_336) dm_build_579(dm_build_581 *DmStatement, dm_bui
 	return nil
 }
 
-func (dm_build_588 *dm_build_336) dm_build_587() ([]byte, error) {
-	var dm_build_589 error
-	if dm_build_588.dm_build_344 == nil {
-		if dm_build_588.dm_build_344, dm_build_589 = security.NewClientKeyPair(); dm_build_589 != nil {
-			return nil, dm_build_589
+func (dm_build_956 *dm_build_696) dm_build_955() ([]byte, error) {
+	var dm_build_957 error
+	if dm_build_956.dm_build_704 == nil {
+		if dm_build_956.dm_build_704, dm_build_957 = security.NewClientKeyPair(); dm_build_957 != nil {
+			return nil, dm_build_957
 		}
 	}
-	return security.Bn2Bytes(dm_build_588.dm_build_344.GetY(), security.DH_KEY_LENGTH), nil
+	return security.Bn2Bytes(dm_build_956.dm_build_704.GetY(), security.DH_KEY_LENGTH), nil
 }
 
-func (dm_build_591 *dm_build_336) dm_build_590() (*security.DhKey, error) {
-	var dm_build_592 error
-	if dm_build_591.dm_build_344 == nil {
-		if dm_build_591.dm_build_344, dm_build_592 = security.NewClientKeyPair(); dm_build_592 != nil {
-			return nil, dm_build_592
+func (dm_build_959 *dm_build_696) dm_build_958() (*security.DhKey, error) {
+	var dm_build_960 error
+	if dm_build_959.dm_build_704 == nil {
+		if dm_build_959.dm_build_704, dm_build_960 = security.NewClientKeyPair(); dm_build_960 != nil {
+			return nil, dm_build_960
 		}
 	}
-	return dm_build_591.dm_build_344, nil
+	return dm_build_959.dm_build_704, nil
 }
 
-func (dm_build_594 *dm_build_336) dm_build_593(dm_build_595 int, dm_build_596 []byte, dm_build_597 string, dm_build_598 int) (dm_build_599 error) {
-	if dm_build_595 > 0 && dm_build_595 < security.MIN_EXTERNAL_CIPHER_ID && dm_build_596 != nil {
-		dm_build_594.dm_build_341, dm_build_599 = security.NewSymmCipher(dm_build_595, dm_build_596)
-	} else if dm_build_595 >= security.MIN_EXTERNAL_CIPHER_ID {
-		if dm_build_594.dm_build_341, dm_build_599 = security.NewThirdPartCipher(dm_build_595, dm_build_596, dm_build_597, dm_build_598); dm_build_599 != nil {
-			dm_build_599 = THIRD_PART_CIPHER_INIT_FAILED.addDetailln(dm_build_599.Error()).throw()
+func (dm_build_962 *dm_build_696) dm_build_961(dm_build_963 int, dm_build_964 []byte, dm_build_965 string, dm_build_966 int) (dm_build_967 error) {
+	if dm_build_963 > 0 && dm_build_963 < security.MIN_EXTERNAL_CIPHER_ID && dm_build_964 != nil {
+		dm_build_962.dm_build_701, dm_build_967 = security.NewSymmCipher(dm_build_963, dm_build_964)
+	} else if dm_build_963 >= security.MIN_EXTERNAL_CIPHER_ID {
+		if dm_build_962.dm_build_701, dm_build_967 = security.NewThirdPartCipher(dm_build_963, dm_build_964, dm_build_965, dm_build_966); dm_build_967 != nil {
+			dm_build_967 = THIRD_PART_CIPHER_INIT_FAILED.addDetailln(dm_build_967.Error()).throw()
 		}
 	}
 	return
 }
 
-func (dm_build_601 *dm_build_336) dm_build_600(dm_build_602 bool) (dm_build_603 error) {
-	if dm_build_601.dm_build_338, dm_build_603 = security.NewTLSFromTCP(dm_build_601.dm_build_337, dm_build_601.dm_build_340.dmConnector.sslCertPath, dm_build_601.dm_build_340.dmConnector.sslKeyPath, dm_build_601.dm_build_340.dmConnector.user); dm_build_603 != nil {
+func (dm_build_969 *dm_build_696) dm_build_968(dm_build_970 bool) (dm_build_971 error) {
+	if dm_build_969.dm_build_698, dm_build_971 = security.NewTLSFromTCP(dm_build_969.dm_build_697, dm_build_969.dm_build_700.dmConnector.sslCertPath, dm_build_969.dm_build_700.dmConnector.sslKeyPath, dm_build_969.dm_build_700.dmConnector.user); dm_build_971 != nil {
 		return
 	}
-	if !dm_build_602 {
-		dm_build_601.dm_build_338 = nil
+	if !dm_build_970 {
+		dm_build_969.dm_build_698 = nil
 	}
 	return
 }
 
-func (dm_build_605 *dm_build_336) dm_build_604(dm_build_606 dm_build_742) bool {
-	return dm_build_606.dm_build_757() != Dm_build_649 && dm_build_605.dm_build_340.sslEncrypt == 1
+func (dm_build_973 *dm_build_696) dm_build_972(dm_build_974 dm_build_1110) bool {
+	return dm_build_974.dm_build_1125() != Dm_build_1017 && dm_build_973.dm_build_700.sslEncrypt == 1
 }

@@ -111,6 +111,7 @@ const (
 	DatabaseProductNameKey   = "databaseProductName"
 	OsAuthTypeKey            = "osAuthType"
 	SchemaKey                = "schema"
+	CatalogKey               = "catalog"
 
 	DO_SWITCH_OFF             int32 = 0
 	DO_SWITCH_WHEN_CONN_ERROR int32 = 1
@@ -163,8 +164,8 @@ const (
 
 	COLUMN_NAME_LOWER_CASE = 2
 
-	compressDef   = Dm_build_698
-	compressIDDef = Dm_build_699
+	compressDef   = Dm_build_1066
+	compressIDDef = Dm_build_1067
 
 	charCodeDef = ""
 
@@ -218,7 +219,7 @@ const (
 
 	sessionTimeoutDef = 0
 
-	osAuthTypeDef = Dm_build_681
+	osAuthTypeDef = Dm_build_1049
 
 	continueBatchOnErrorDef = false
 
@@ -228,7 +229,7 @@ const (
 
 	maxRowsDef = 0
 
-	rowPrefetchDef = Dm_build_682
+	rowPrefetchDef = Dm_build_1050
 
 	bufPrefetchDef = 0
 
@@ -398,6 +399,8 @@ type DmConnector struct {
 
 	schema string
 
+	catalog string
+
 	logLevel int
 
 	logDir string
@@ -515,7 +518,7 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	c.rwStandby = props.GetBool(RwStandbyKey, c.rwStandby)
 
 	if b := props.GetBool(IsCompressKey, false); b {
-		c.compress = Dm_build_697
+		c.compress = Dm_build_1065
 	}
 
 	c.compress = props.GetInt(CompressKey, c.compress, 0, 2)
@@ -569,7 +572,7 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	c.autoCommit = props.GetBool(AutoCommitKey, c.autoCommit)
 	c.maxRows = props.GetInt(MaxRowsKey, c.maxRows, 0, int(INT32_MAX))
 	c.rowPrefetch = props.GetInt(RowPrefetchKey, c.rowPrefetch, 0, int(INT32_MAX))
-	c.bufPrefetch = props.GetInt(BufPrefetchKey, c.bufPrefetch, int(Dm_build_683), int(Dm_build_684))
+	c.bufPrefetch = props.GetInt(BufPrefetchKey, c.bufPrefetch, int(Dm_build_1051), int(Dm_build_1052))
 	c.lobMode = props.GetInt(LobModeKey, c.lobMode, 1, 2)
 	c.stmtPoolMaxSize = props.GetInt(StmtPoolSizeKey, c.stmtPoolMaxSize, 0, int(INT32_MAX))
 	c.ignoreCase = props.GetBool(IgnoreCaseKey, c.ignoreCase)
@@ -606,6 +609,7 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	}
 
 	c.schema = props.GetTrimString(SchemaKey, c.schema)
+	c.catalog = props.GetTrimString(CatalogKey, c.catalog)
 
 	c.logLevel = ParseLogLevel(props)
 	LogLevel = c.logLevel
@@ -638,26 +642,26 @@ func (c *DmConnector) parseOsAuthType(props *Properties) error {
 	value := props.GetString(OsAuthTypeKey, "")
 	if value != "" && !util.StringUtil.IsDigit(value) {
 		if util.StringUtil.EqualsIgnoreCase(value, "ON") {
-			c.osAuthType = Dm_build_681
+			c.osAuthType = Dm_build_1049
 		} else if util.StringUtil.EqualsIgnoreCase(value, "SYSDBA") {
-			c.osAuthType = Dm_build_677
+			c.osAuthType = Dm_build_1045
 		} else if util.StringUtil.EqualsIgnoreCase(value, "SYSAUDITOR") {
-			c.osAuthType = Dm_build_679
+			c.osAuthType = Dm_build_1047
 		} else if util.StringUtil.EqualsIgnoreCase(value, "SYSSSO") {
-			c.osAuthType = Dm_build_678
+			c.osAuthType = Dm_build_1046
 		} else if util.StringUtil.EqualsIgnoreCase(value, "AUTO") {
-			c.osAuthType = Dm_build_680
+			c.osAuthType = Dm_build_1048
 		} else if util.StringUtil.EqualsIgnoreCase(value, "OFF") {
-			c.osAuthType = Dm_build_676
+			c.osAuthType = Dm_build_1044
 		}
 	} else {
 		c.osAuthType = byte(props.GetInt(OsAuthTypeKey, int(c.osAuthType), 0, 4))
 	}
-	if c.user == "" && c.osAuthType == Dm_build_676 {
+	if c.user == "" && c.osAuthType == Dm_build_1044 {
 		c.user = "SYSDBA"
-	} else if c.osAuthType != Dm_build_676 && c.user != "" {
+	} else if c.osAuthType != Dm_build_1044 && c.user != "" {
 		return ECGO_OSAUTH_ERROR.throw()
-	} else if c.osAuthType != Dm_build_676 {
+	} else if c.osAuthType != Dm_build_1044 {
 		c.user = os.Getenv("user")
 		c.password = ""
 	}
@@ -888,7 +892,7 @@ func (c *DmConnector) connectSingle(ctx context.Context) (*DmConnection, error) 
 	dc.objId = -1
 	dc.init()
 
-	dc.Access, err = dm_build_348(ctx, dc)
+	dc.Access, err = dm_build_708(ctx, dc)
 	if err != nil {
 		return nil, err
 	}
@@ -899,7 +903,7 @@ func (c *DmConnector) connectSingle(ctx context.Context) (*DmConnection, error) 
 	}
 	defer dc.finish()
 
-	if err = dc.Access.dm_build_393(); err != nil {
+	if err = dc.Access.dm_build_753(); err != nil {
 
 		if !dc.closed.IsSet() {
 			close(dc.closech)

@@ -84,6 +84,8 @@ type execRetInfo struct {
 	retSqlType int16 // 执行返回的语句类型
 
 	execId int32
+
+	serverParams []parameter
 }
 
 type column struct {
@@ -240,7 +242,7 @@ func (parameter *parameter) resetType(colType int32) {
 	case DATETIME2_TZ:
 		parameter.prec = DATETIME2_TZ_PREC
 		parameter.scale = 9
-	case REAL,DOUBLE,DECIMAL,INTERVAL_YM,INTERVAL_DT,ARRAY,CLASS,PLTYPE_RECORD,SARRAY:
+	case REAL, DOUBLE, DECIMAL, INTERVAL_YM, INTERVAL_DT, ARRAY, CLASS, PLTYPE_RECORD, SARRAY:
 		parameter.prec = 0
 	case UNKNOWN, NULL:
 		// UNKNOWN 导致服务器断言 // setNull导致服务器报错“字符转换失败”
