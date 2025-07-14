@@ -37,6 +37,9 @@ type rwCounter struct {
 	flag []int32
 
 	increments []int32
+
+	//用来计数,选择存活的standby节点
+	indexCount int64
 }
 
 func newRWCounter(primaryPercent int32, standbyCount int32) *rwCounter {

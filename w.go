@@ -107,7 +107,8 @@ func NewDmTimestampFromTime(time time.Time) *DmTimestamp {
 }
 
 func (dmTimestamp *DmTimestamp) ToTime() time.Time {
-	return toTimeFromDT(dmTimestamp.dt, 0)
+	_, tzs := time.Now().Zone()
+	return toTimeFromDT(dmTimestamp.dt, tzs/60)
 }
 
 // 获取年月日时分秒毫秒时区
@@ -180,7 +181,8 @@ func (dmTimestamp *DmTimestamp) getDt() []int {
 }
 
 func (dmTimestamp *DmTimestamp) getTime() int64 {
-	sec := toTimeFromDT(dmTimestamp.dt, 0).Unix()
+	_, tzs := time.Now().Zone()
+	sec := toTimeFromDT(dmTimestamp.dt, tzs/60).Unix()
 	return sec + int64(dmTimestamp.dt[OFFSET_NANOSECOND])
 }
 

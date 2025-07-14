@@ -82,7 +82,6 @@ func (StringUtil *stringutil) HexStringToBytes(s string) []byte {
 	bs := make([]byte, 0)
 	flag := false
 
-	str = strings.TrimSpace(str)
 	if strings.Index(str, "0x") == 0 || strings.Index(str, "0X") == 0 {
 		str = str[2:]
 	}

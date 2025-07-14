@@ -13,14 +13,15 @@ import (
 )
 
 const (
-	XDEC_MAX_PREC int = 38
+	XDEC_MAX_PREC int = 40
 	XDEC_SIZE         = 21
 
-	FLAG_ZERO     int = 0x80
-	FLAG_POSITIVE int = 0xC1
-	FLAG_NEGTIVE  int = 0x3E
-	EXP_MAX       int = 0xFF - 1 - FLAG_POSITIVE
-	EXP_MIN       int = FLAG_NEGTIVE + 1 - 0x7F
+	FLAG_ZERO        int = 0x80
+	FLAG_POSITIVE    int = 0xC1
+	FLAG_NEGTIVE     int = 0x3E
+	POSITIVE_EXP_MAX     = 0xff - FLAG_POSITIVE
+	EXP_MAX          int = 0xFF - 1 - FLAG_POSITIVE
+	EXP_MIN          int = FLAG_NEGTIVE + 1 - 0x7F
 
 	NUM_POSITIVE int = 1
 	NUM_NEGTIVE  int = 101
@@ -319,7 +320,15 @@ func (d DmDecimal) encodeDecimal() ([]byte, error) {
 		return []byte{byte(FLAG_ZERO)}, nil
 	}
 	exp := (d.weight+len(d.digits))/2 - 1
-	if exp > EXP_MAX || exp < EXP_MIN {
+
+	var realExpMax int
+
+	if d.sign == NUM_POSITIVE {
+		realExpMax = POSITIVE_EXP_MAX
+	} else {
+		realExpMax = EXP_MAX
+	}
+	if exp > realExpMax || exp < EXP_MIN {
 		return nil, ECGO_DATA_TOO_LONG.throw()
 	}
 	validLen := len(d.digits)/2 + 1
@@ -391,7 +400,7 @@ func decodeDecimal(values []byte, prec int, scale int) (*DmDecimal, error) {
 		decimal.sign = -1
 	}
 
-	var flag = int(Dm_build_1.Dm_build_121(values, 0))
+	var flag = int(Dm_build_652.Dm_build_772(values, 0))
 	var exp int
 	if decimal.sign > 0 {
 		exp = flag - FLAG_POSITIVE

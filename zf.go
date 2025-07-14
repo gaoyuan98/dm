@@ -49,7 +49,7 @@ func (rf *reconnectFilter) autoReconnect(connection *DmConnection, err error) er
 func (rf *reconnectFilter) reconnect(connection *DmConnection, reason string) error {
 	// 读写分离，重连需要处理备机
 	var err error
-	if connection.dmConnector.rwSeparate {
+	if connection.dmConnector.rwSeparate > RW_SEPARATE_OFF {
 		err = RWUtil.reconnect(connection)
 	} else {
 		err = connection.reconnect()

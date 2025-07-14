@@ -171,8 +171,11 @@ func load(filePath string) {
 			}
 
 		} else {
-			cfgInfo := strings.Split(line, "=")
-			if len(cfgInfo) < 2 {
+			cfgInfo := [2]string{}
+			if index := strings.Index(line, "="); index > 0 {
+				cfgInfo[0] = line[0:index]
+				cfgInfo[1] = line[index+1:]
+			} else {
 				continue
 			}
 			key := strings.TrimSpace(cfgInfo[0])
@@ -340,6 +343,8 @@ func SetServerGroupProperties(props *Properties, key string, value string) bool 
 	} else if key == "USER_REMAP" {
 		tmp := props.GetString(UserRemapKey, "")
 		props.Set(UserRemapKey, tmp+"("+value+")")
+	} else if key == "SERVER_OPTION" {
+		props.Set(ServerOptionKey, value)
 	} else {
 		return false
 	}
@@ -402,7 +407,6 @@ func setDriverAttributes(props *Properties) {
 
 	parseLanguage(props.GetString(LanguageKey, "cn"))
 	DbAliveCheckFreq = props.GetInt(DbAliveCheckFreqKey, DbAliveCheckFreqDef, 1, int(INT32_MAX))
-
 	//// log
 	//LogLevel = ParseLogLevel(props)
 	//LogDir = util.StringUtil.FormatDir(props.GetTrimString(LogDirKey, LogDirDef))

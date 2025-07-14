@@ -51,10 +51,10 @@ func (g *epGroup) connect(connector *DmConnector) (*DmConnection, error) {
 	var dbSelector = g.getEPSelector(connector)
 	var ex error = nil
 	// 如果配置了loginMode的主、备等优先策略，而未找到最高优先级的节点时持续循环switchtimes次，如果最终还是没有找到最高优先级则选择次优先级的
-	// 如果只有一个节点，一轮即可决定是否连接；多个节点时保证switchTimes轮尝试，最后一轮决定用哪个节点（由于节点已经按照模式优先级排序，最后一轮理论上就是连第一个节点）
+	// 如果只有一个节点，无需switchTimes+1；多个节点时保证switchTimes轮尝试，最后一轮决定用哪个节点（由于节点已经按照模式优先级排序，最后一轮理论上就是连第一个节点）
 	var cycleCount int32
 	if len(g.epList) == 1 {
-		cycleCount = 1
+		cycleCount = connector.switchTimes
 	} else {
 		cycleCount = connector.switchTimes + 1
 	}

@@ -105,7 +105,7 @@ func runLog() {
 			flushFreq:  LogFlushFreq,
 			filePath:   LogDir,
 			filePrefix: "dm_go",
-			buffer:     Dm_build_286(),
+			buffer:     Dm_build_937(),
 		}
 		go goMap["log"].doRun()
 	}
@@ -148,7 +148,7 @@ func (f *filterable) createFilterChain(bc *DmConnector, props *Properties) {
 			f.recoverInfo = newRecoverInfo()
 		}
 
-		if bc.rwSeparate {
+		if bc.rwSeparate > RW_SEPARATE_OFF {
 			filters = append(filters, &rwFilter{})
 			f.rwInfo = newRwInfo()
 		}

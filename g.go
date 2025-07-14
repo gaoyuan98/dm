@@ -2031,7 +2031,7 @@ type statFlusher struct {
 	flushFreq  int
 	filePath   string
 	filePrefix string
-	buffer     *Dm_build_282
+	buffer     *Dm_build_933
 }
 
 func newStatFlusher() *statFlusher {
@@ -2042,7 +2042,7 @@ func newStatFlusher() *statFlusher {
 	sf.flushFreq = StatFlushFreq
 	sf.filePath = StatDir
 	sf.filePrefix = "dm_go_stat"
-	sf.buffer = Dm_build_286()
+	sf.buffer = Dm_build_937()
 	return sf
 }
 
@@ -2104,25 +2104,25 @@ func (sf *statFlusher) writeAndFlush(logs []string, startOff int, l int) {
 	for i := startOff; i < startOff+l; i++ {
 		bytes = []byte(logs[i] + util.StringUtil.LineSeparator())
 
-		sf.buffer.Dm_build_308(bytes, 0, len(bytes))
+		sf.buffer.Dm_build_959(bytes, 0, len(bytes))
 
-		if sf.buffer.Dm_build_287() >= FLUSH_SIZE {
+		if sf.buffer.Dm_build_938() >= FLUSH_SIZE {
 			sf.doFlush(sf.buffer)
 		}
 	}
 
-	if sf.buffer.Dm_build_287() > 0 {
+	if sf.buffer.Dm_build_938() > 0 {
 		sf.doFlush(sf.buffer)
 	}
 }
 
-func (sf *statFlusher) doFlush(buffer *Dm_build_282) {
+func (sf *statFlusher) doFlush(buffer *Dm_build_933) {
 	if sf.needCreateNewFile() {
 		sf.closeCurrentFile()
 		sf.logFile = sf.createNewFile()
 	}
 	if sf.logFile != nil {
-		buffer.Dm_build_302(sf.logFile, buffer.Dm_build_287())
+		buffer.Dm_build_953(sf.logFile, buffer.Dm_build_938())
 	}
 }
 func (sf *statFlusher) closeCurrentFile() {

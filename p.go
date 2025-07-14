@@ -13,9 +13,10 @@ import (
 	"sync"
 )
 
-var version = "8.1.4.48"
-var build_date = "2025.01.17"
-var svn = "32097"
+// 发版标记
+var version = "8.1.4.147"
+var build_date = "2025.07.07"
+var svn = "37622"
 
 var globalDmDriver = newDmDriver()
 
