@@ -14,9 +14,9 @@ import (
 )
 
 // 发版标记
-var version = "8.1.4.147"
-var build_date = "2025.07.07"
-var svn = "37622"
+var version = "8.1.4.177"
+var build_date = "2025.08.26"
+var svn = "40646"
 
 var globalDmDriver = newDmDriver()
 
@@ -111,4 +111,8 @@ func (d *DmDriver) openConnector(dsn string) (*DmConnector, error) {
 	}
 	connector.createFilterChain(connector, nil)
 	return connector, nil
+}
+
+func GetDriverVersion() string {
+	return version
 }

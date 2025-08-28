@@ -378,16 +378,16 @@ func (column *column) getColumnData(bytes []byte, conn *DmConnection) (driver.Va
 	case TINYINT:
 		return int8(bytes[0]), nil
 	case SMALLINT:
-		return Dm_build_652.Dm_build_749(bytes, 0), nil
+		return Dm_build_1268.Dm_build_1365(bytes, 0), nil
 	case INT:
-		return Dm_build_652.Dm_build_754(bytes, 0), nil
+		return Dm_build_1268.Dm_build_1370(bytes, 0), nil
 	case BIGINT:
-		return Dm_build_652.Dm_build_759(bytes, 0), nil
+		return Dm_build_1268.Dm_build_1375(bytes, 0), nil
 	case REAL:
-		return Dm_build_652.Dm_build_764(bytes, 0), nil
+		return Dm_build_1268.Dm_build_1380(bytes, 0), nil
 	case DOUBLE:
 
-		return Dm_build_652.Dm_build_768(bytes, 0), nil
+		return Dm_build_1268.Dm_build_1384(bytes, 0), nil
 	case DATE, TIME, DATETIME, TIME_TZ, DATETIME_TZ, DATETIME2, DATETIME2_TZ:
 		return DB2G.toTime(bytes, column, conn)
 	case INTERVAL_DT:
@@ -416,7 +416,7 @@ func (column *column) getColumnData(bytes []byte, conn *DmConnection) (driver.Va
 		return blob.getBytes(1, int32(l))
 
 	case CHAR, VARCHAR2, VARCHAR:
-		return Dm_build_652.Dm_build_809(bytes, 0, len(bytes), conn.getServerEncoding(), conn), nil
+		return Dm_build_1268.Dm_build_1425(bytes, 0, len(bytes), conn.getServerEncoding(), conn), nil
 	case CLOB:
 		clob := DB2G.toDmClob(bytes, conn, column)
 
@@ -424,7 +424,15 @@ func (column *column) getColumnData(bytes []byte, conn *DmConnection) (driver.Va
 		if err != nil {
 			return nil, err
 		}
-		return clob.getSubString(1, int32(l))
+		str, err := clob.getSubString(1, int32(l))
+		if err != nil {
+			return str, err
+		}
+		if conn.dmConnector.clobToBytes {
+			return []byte(str), err
+		} else {
+			return str, err
+		}
 
 	}
 

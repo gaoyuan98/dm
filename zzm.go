@@ -77,6 +77,8 @@ const (
 	StatSqlMaxCountDef = 100000 // sql 统计最大值(0-100000)
 
 	StatSqlRemoveModeDef = STAT_SQL_REMOVE_LATEST // 记录sql数超过最大值时，sql淘汰方式
+
+	ClobToBytesDef = false //Clob是否转换为bytes
 )
 
 var (
@@ -345,6 +347,8 @@ func SetServerGroupProperties(props *Properties, key string, value string) bool 
 		props.Set(UserRemapKey, tmp+"("+value+")")
 	} else if key == "SERVER_OPTION" {
 		props.Set(ServerOptionKey, value)
+	} else if key == "CLOB_TO_BYTES" {
+		props.Set(ClobToBytesKey, value)
 	} else {
 		return false
 	}

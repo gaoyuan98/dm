@@ -255,7 +255,7 @@ func (parameter *parameter) resetType(colType int32) {
 func (execInfo *execRetInfo) union(other *execRetInfo, startRow int, count int) {
 	if count == 1 {
 		execInfo.updateCounts[startRow] = other.updateCount
-	} else if execInfo.updateCounts != nil {
+	} else if execInfo.updateCounts != nil && other.updateCounts != nil {
 		copy(execInfo.updateCounts[startRow:startRow+count], other.updateCounts[0:count])
 	}
 	if execInfo.outParamDatas != nil {

@@ -113,6 +113,7 @@ const (
 	SchemaKey                = "schema"
 	CatalogKey               = "catalog"
 	ServerOptionKey          = "serverOption"
+	ClobToBytesKey           = "clobToBytes"
 
 	DO_SWITCH_OFF             int32 = 0
 	DO_SWITCH_WHEN_CONN_ERROR int32 = 1
@@ -177,8 +178,8 @@ const (
 
 	RW_SEPARATE_USER_DEFINED int32 = 5
 
-	compressDef   = Dm_build_91
-	compressIDDef = Dm_build_92
+	compressDef   = Dm_build_706
+	compressIDDef = Dm_build_707
 
 	charCodeDef = ""
 
@@ -232,7 +233,7 @@ const (
 
 	sessionTimeoutDef = 0
 
-	osAuthTypeDef = Dm_build_74
+	osAuthTypeDef = Dm_build_689
 
 	continueBatchOnErrorDef = false
 
@@ -242,7 +243,7 @@ const (
 
 	maxRowsDef = 0
 
-	rowPrefetchDef = Dm_build_75
+	rowPrefetchDef = Dm_build_690
 
 	bufPrefetchDef = 0
 
@@ -435,6 +436,8 @@ type DmConnector struct {
 	statSqlRemoveMode int
 
 	serverOption []string
+
+	clobToBytes bool
 }
 
 func (c *DmConnector) init() *DmConnector {
@@ -529,7 +532,7 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	c.rwStandby = props.GetBool(RwStandbyKey, c.rwStandby)
 
 	if b := props.GetBool(IsCompressKey, false); b {
-		c.compress = Dm_build_90
+		c.compress = Dm_build_705
 	}
 
 	c.compress = props.GetInt(CompressKey, c.compress, 0, 2)
@@ -583,7 +586,7 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	c.autoCommit = props.GetBool(AutoCommitKey, c.autoCommit)
 	c.maxRows = props.GetInt(MaxRowsKey, c.maxRows, 0, int(INT32_MAX))
 	c.rowPrefetch = props.GetInt(RowPrefetchKey, c.rowPrefetch, 0, int(INT32_MAX))
-	c.bufPrefetch = props.GetInt(BufPrefetchKey, c.bufPrefetch, int(Dm_build_76), int(Dm_build_77))
+	c.bufPrefetch = props.GetInt(BufPrefetchKey, c.bufPrefetch, int(Dm_build_691), int(Dm_build_692))
 	c.lobMode = props.GetInt(LobModeKey, c.lobMode, 1, 2)
 	c.stmtPoolMaxSize = props.GetInt(StmtPoolSizeKey, c.stmtPoolMaxSize, 0, int(INT32_MAX))
 
@@ -646,7 +649,9 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	c.statSqlMaxCount = props.GetInt(StatSqlMaxCountKey, StatSqlMaxCountDef, 0, 100000)
 	StatSqlMaxCount = c.statSqlMaxCount
 	c.parseStatSqlRemoveMode(props)
+
 	c.parseServerOption(props)
+	c.clobToBytes = props.GetBool(ClobToBytesKey, ClobToBytesDef)
 	return nil
 }
 
@@ -669,26 +674,26 @@ func (c *DmConnector) parseOsAuthType(props *Properties) error {
 	value := props.GetString(OsAuthTypeKey, "")
 	if value != "" && !util.StringUtil.IsDigit(value) {
 		if util.StringUtil.EqualsIgnoreCase(value, "ON") {
-			c.osAuthType = Dm_build_74
+			c.osAuthType = Dm_build_689
 		} else if util.StringUtil.EqualsIgnoreCase(value, "SYSDBA") {
-			c.osAuthType = Dm_build_70
+			c.osAuthType = Dm_build_685
 		} else if util.StringUtil.EqualsIgnoreCase(value, "SYSAUDITOR") {
-			c.osAuthType = Dm_build_72
+			c.osAuthType = Dm_build_687
 		} else if util.StringUtil.EqualsIgnoreCase(value, "SYSSSO") {
-			c.osAuthType = Dm_build_71
+			c.osAuthType = Dm_build_686
 		} else if util.StringUtil.EqualsIgnoreCase(value, "AUTO") {
-			c.osAuthType = Dm_build_73
+			c.osAuthType = Dm_build_688
 		} else if util.StringUtil.EqualsIgnoreCase(value, "OFF") {
-			c.osAuthType = Dm_build_69
+			c.osAuthType = Dm_build_684
 		}
 	} else {
 		c.osAuthType = byte(props.GetInt(OsAuthTypeKey, int(c.osAuthType), 0, 4))
 	}
-	if c.user == "" && c.osAuthType == Dm_build_69 {
+	if c.user == "" && c.osAuthType == Dm_build_684 {
 		c.user = "SYSDBA"
-	} else if c.osAuthType != Dm_build_69 && c.user != "" {
+	} else if c.osAuthType != Dm_build_684 && c.user != "" {
 		return ECGO_OSAUTH_ERROR.throw()
-	} else if c.osAuthType != Dm_build_69 {
+	} else if c.osAuthType != Dm_build_684 {
 		c.user = os.Getenv("user")
 		c.password = ""
 	}
@@ -936,7 +941,7 @@ func (c *DmConnector) connectSingle(ctx context.Context) (*DmConnection, error) 
 	dc.objId = -1
 	dc.init()
 
-	dc.Access, err = dm_build_1359(ctx, dc)
+	dc.Access, err = dm_build_348(ctx, dc)
 	if err != nil {
 		return nil, err
 	}
@@ -947,7 +952,7 @@ func (c *DmConnector) connectSingle(ctx context.Context) (*DmConnection, error) 
 	}
 	defer dc.finish()
 
-	if err = dc.Access.dm_build_1404(); err != nil {
+	if err = dc.Access.dm_build_393(); err != nil {
 
 		if !dc.closed.IsSet() {
 			close(dc.closech)
