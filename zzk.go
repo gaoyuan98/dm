@@ -254,7 +254,7 @@ func (dc *DmConnection) execOpt(sql string, optParamList []OptParameter, serverE
 					if backSlashFlag {
 						lval.Value = util.StringUtil.Translate(lval.Value)
 					}
-					optParamList = append(optParamList, newOptParameter(Dm_build_1268.Dm_build_1484(lval.Value, serverEncoding, dc), VARCHAR, VARCHAR_PREC))
+					optParamList = append(optParamList, newOptParameter(Dm_build_1355.Dm_build_1571(lval.Value, serverEncoding, dc), VARCHAR, VARCHAR_PREC))
 				}
 			}
 		case parser.HEX_INT:

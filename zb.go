@@ -86,6 +86,8 @@ type execRetInfo struct {
 	execId int32
 
 	serverParams []parameter
+
+	nativeSQL string
 }
 
 type column struct {

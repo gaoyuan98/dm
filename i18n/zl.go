@@ -243,6 +243,10 @@ const Messages_zh_CN = `{
 	{
       "id": "error.connectionClosedOrNotBuild",
 	  "translation": "连接尚未建立或已经关闭"
+	},
+	{
+      "id": "error.srcMultiRows",
+	  "translation": "无法在源表中获得一组稳定的行"
 	}
   ]
 }`

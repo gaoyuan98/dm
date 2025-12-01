@@ -400,7 +400,7 @@ func decodeDecimal(values []byte, prec int, scale int) (*DmDecimal, error) {
 		decimal.sign = -1
 	}
 
-	var flag = int(Dm_build_1268.Dm_build_1388(values, 0))
+	var flag = int(Dm_build_1355.Dm_build_1475(values, 0))
 	var exp int
 	if decimal.sign > 0 {
 		exp = flag - FLAG_POSITIVE

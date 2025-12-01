@@ -33,6 +33,8 @@ type DmStatement struct {
 
 	innerExec bool
 
+	multiRowsError bool
+
 	id int32
 
 	cursorName string
@@ -139,7 +141,7 @@ func (rpv rsPoolValue) refreshed(conn *DmConnection) (bool, error) {
 		return false, nil
 	}
 
-	tss, err := conn.Access.Dm_build_498(interface{}(rpv.m_TbIds).([]uint32))
+	tss, err := conn.Access.Dm_build_576(interface{}(rpv.m_TbIds).([]uint32))
 	if err != nil {
 		return false, err
 	}
@@ -336,7 +338,7 @@ func (st *DmStatement) prepare() error {
 		}
 	}
 
-	st.execInfo, err = st.dmConn.Access.Dm_build_415(st, Dm_build_710)
+	st.execInfo, err = st.dmConn.Access.Dm_build_493(st, Dm_build_790)
 	if err != nil {
 		return err
 	}
@@ -408,7 +410,7 @@ func (stmt *DmStatement) exec(args []driver.Value) (*DmResult, error) {
 		}
 		err = stmt.executeBatch(tmpArg)
 	} else {
-		err = stmt.executeInner(args, Dm_build_710)
+		err = stmt.executeInner(args, Dm_build_790)
 	}
 	if err != nil {
 		return nil, err
@@ -434,7 +436,7 @@ func (stmt *DmStatement) execContext(ctx context.Context, args []driver.NamedVal
 func (stmt *DmStatement) query(args []driver.Value) (*DmRows, error) {
 	var err error
 	stmt.inUse = true
-	err = stmt.executeInner(args, Dm_build_711)
+	err = stmt.executeInner(args, Dm_build_791)
 	if err != nil {
 		return nil, err
 	}
@@ -482,7 +484,7 @@ func NewDmStmt(conn *DmConnection, sql string) (*DmStatement, error) {
 		s.inUse = true
 		s.isBatch = conn.isBatch
 
-		err := conn.Access.Dm_build_397(s)
+		err := conn.Access.Dm_build_475(s)
 		if err != nil {
 			return nil, err
 		}
@@ -510,7 +512,7 @@ func (stmt *DmStatement) free() error {
 		rs.Close()
 	}
 
-	err := stmt.dmConn.Access.Dm_build_402(int32(stmt.id))
+	err := stmt.dmConn.Access.Dm_build_480(int32(stmt.id))
 	if err != nil {
 		return err
 	}
@@ -639,7 +641,7 @@ func bindOutParam(stmt *DmStatement, i int, dtype int32) error {
 			if bindParam.cursorStmt == nil {
 				bindParam.cursorStmt = &DmStatement{dmConn: stmt.dmConn}
 				bindParam.cursorStmt.resetFilterable(&stmt.dmConn.filterable)
-				err = bindParam.cursorStmt.dmConn.Access.Dm_build_397(bindParam.cursorStmt)
+				err = bindParam.cursorStmt.dmConn.Access.Dm_build_475(bindParam.cursorStmt)
 			}
 		}
 	}
@@ -665,12 +667,12 @@ func encodeArgs(stmt *DmStatement, args []driver.Value, firstRow bool) ([]interf
 			if stmt.bindParams[i].cursorStmt == nil {
 				stmt.bindParams[i].cursorStmt = &DmStatement{dmConn: stmt.dmConn}
 				stmt.bindParams[i].cursorStmt.resetFilterable(&stmt.dmConn.filterable)
-				err = stmt.bindParams[i].cursorStmt.dmConn.Access.Dm_build_397(stmt.bindParams[i].cursorStmt)
+				err = stmt.bindParams[i].cursorStmt.dmConn.Access.Dm_build_475(stmt.bindParams[i].cursorStmt)
 			}
 			stmt.bindParams[i].ioType = IO_TYPE_INOUT
 			continue
 		}
-		if arg == nil {
+		if checkNull(arg) {
 			bindInParam(stmt, i, NULL, true, firstRow)
 			bytes[i] = nil
 
@@ -705,7 +707,12 @@ func encodeArgs(stmt *DmStatement, args []driver.Value, firstRow bool) ([]interf
 		case uint32:
 			bindInParam(stmt, i, BIGINT, false, firstRow)
 			bytes[i], err = G2DB.fromInt64(int64(v), stmt.bindParams[i], stmt.dmConn)
-
+		case uint64:
+			bindInParam(stmt, i, BIGINT, false, firstRow)
+			bytes[i], err = G2DB.fromInt64(int64(v), stmt.bindParams[i], stmt.dmConn)
+		case uint:
+			bindInParam(stmt, i, BIGINT, false, firstRow)
+			bytes[i], err = G2DB.fromInt64(int64(v), stmt.bindParams[i], stmt.dmConn)
 		case float32:
 			bindInParam(stmt, i, REAL, false, firstRow)
 			bytes[i], err = G2DB.fromFloat32(v, stmt.bindParams[i], stmt.dmConn)
@@ -847,7 +854,7 @@ func encodeArgs(stmt *DmStatement, args []driver.Value, firstRow bool) ([]interf
 				if stmt.bindParams[i].cursorStmt == nil {
 					stmt.bindParams[i].cursorStmt = &DmStatement{dmConn: stmt.dmConn}
 					stmt.bindParams[i].cursorStmt.resetFilterable(&stmt.dmConn.filterable)
-					err = stmt.bindParams[i].cursorStmt.dmConn.Access.Dm_build_397(stmt.bindParams[i].cursorStmt)
+					err = stmt.bindParams[i].cursorStmt.dmConn.Access.Dm_build_475(stmt.bindParams[i].cursorStmt)
 				}
 			}
 		case io.Reader:
@@ -868,6 +875,21 @@ func encodeArgs(stmt *DmStatement, args []driver.Value, firstRow bool) ([]interf
 	checkBindParameters(stmt, bytes)
 
 	return bytes, nil
+}
+
+func checkNull(arg interface{}) bool {
+	if arg == nil {
+		return true
+	}
+
+	innerValuer, ok := arg.(driver.Valuer)
+	if ok {
+		innerValue, err := innerValuer.Value()
+		if err == nil && innerValue == nil {
+			return true
+		}
+	}
+	return false
 }
 
 type converter struct {
@@ -1033,7 +1055,7 @@ func (stmt *DmStatement) executeInner(args []driver.Value, executeType int16) (e
 			return err
 		}
 	}
-	stmt.execInfo, err = stmt.dmConn.Access.Dm_build_455(stmt, bytes, false)
+	stmt.execInfo, err = stmt.dmConn.Access.Dm_build_533(stmt, bytes, false)
 	if err != nil {
 		return err
 	}
@@ -1104,7 +1126,7 @@ func (stmt *DmStatement) executeInner(args []driver.Value, executeType int16) (e
 					v, err = TypeDataSV.bytesToObj(outParamData, nil, stmt.bindParams[i].typeDescriptor)
 				case CURSOR:
 					var tmpExecInfo *execRetInfo
-					if tmpExecInfo, err = stmt.dmConn.Access.Dm_build_465(stmt.bindParams[i].cursorStmt, 1); err != nil {
+					if tmpExecInfo, err = stmt.dmConn.Access.Dm_build_543(stmt.bindParams[i].cursorStmt, 1); err != nil {
 						return err
 					}
 					if tmpExecInfo.hasResultSet {
@@ -1467,7 +1489,7 @@ func (stmt *DmStatement) executeInner(args []driver.Value, executeType int16) (e
 				case *driver.Rows:
 					if stmt.bindParams[i].colType == CURSOR {
 						var tmpExecInfo *execRetInfo
-						tmpExecInfo, err = stmt.dmConn.Access.Dm_build_465(stmt.bindParams[i].cursorStmt, 1)
+						tmpExecInfo, err = stmt.dmConn.Access.Dm_build_543(stmt.bindParams[i].cursorStmt, 1)
 						if err != nil {
 							return err
 						}
@@ -1517,14 +1539,15 @@ func (stmt *DmStatement) executeBatch(args []driver.Value) (err error) {
 
 	var bytes [][]interface{}
 
-	if stmt.execInfo.retSqlType == Dm_build_725 || stmt.execInfo.retSqlType == Dm_build_730 {
+	var retSqlType = stmt.execInfo.retSqlType
+	if retSqlType == Dm_build_805 || retSqlType == Dm_build_811 {
 		return ECGO_INVALID_SQL_TYPE.throw()
 	}
 
 	if stmt.paramCount > 0 && args != nil && len(args) > 0 {
 
 		if len(args) == 1 || stmt.dmConn.dmConnector.batchType == 2 ||
-			(stmt.dmConn.dmConnector.batchNotOnCall && stmt.execInfo.retSqlType == Dm_build_726) {
+			(stmt.dmConn.dmConnector.batchNotOnCall && retSqlType == Dm_build_806) {
 			return stmt.executeBatchByRow(args)
 		} else {
 			for i, arg := range args {
@@ -1538,7 +1561,18 @@ func (stmt *DmStatement) executeBatch(args []driver.Value) (err error) {
 				}
 				bytes = append(bytes, tmpBytes)
 			}
-			stmt.execInfo, err = stmt.dmConn.Access.Dm_build_436(stmt, bytes, stmt.preExec)
+			stmt.execInfo, err = stmt.dmConn.Access.Dm_build_514(stmt, bytes, stmt.preExec)
+
+			if err != nil {
+				if dmErr, ok := err.(*DmError); ok {
+					if dmErr.ErrCode == EC_SRC_MULTI_ROWS.ErrCode && !stmt.multiRowsError && retSqlType != Dm_build_807 {
+						stmt.multiRowsError = true
+
+						stmt.execInfo, err = stmt.dmConn.Access.Dm_build_514(stmt, bytes, stmt.preExec)
+						stmt.multiRowsError = false
+					}
+				}
+			}
 		}
 	}
 	return err
@@ -1550,7 +1584,7 @@ func (stmt *DmStatement) executeBatchByRow(args []driver.Value) (err error) {
 	stmt.execInfo.updateCounts = make([]int64, count)
 	var sqlErrBuilder strings.Builder
 	for i := 0; i < count; i++ {
-		tmpExecInfo, err := stmt.dmConn.Access.Dm_build_455(stmt, args[i].([]interface{}), stmt.preExec || i != 0)
+		tmpExecInfo, err := stmt.dmConn.Access.Dm_build_533(stmt, args[i].([]interface{}), stmt.preExec || i != 0)
 		if err == nil {
 			stmt.execInfo.union(tmpExecInfo, i, 1)
 		} else {

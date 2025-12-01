@@ -243,6 +243,10 @@ const Messages_en_US = `{
 	{
       "id": "error.connectionClosedOrNotBuild",
 	  "translation": "Connection is colsed or not build"
+	},
+	{
+      "id": "error.srcMultiRows",
+	  "translation": "Unable to get a stable set of rows in the source table"
 	}
   ]
 }`

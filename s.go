@@ -4,6 +4,8 @@
  */
 package dm
 
+import "strings"
+
 type DmResult struct {
 	filterable
 	dmStmt       *DmStatement
@@ -16,19 +18,23 @@ func newDmResult(bs *DmStatement, execInfo *execRetInfo) *DmResult {
 	result.resetFilterable(&bs.filterable)
 	result.dmStmt = bs
 	result.affectedRows = execInfo.updateCount
-	result.insertId = execInfo.lastInsertId
+
+	if execInfo.lastInsertId == 0 && execInfo.hasResultSet && strings.Index(execInfo.nativeSQL, "/*DMGORM-UPSERT*/") == 0 {
+		if len(execInfo.rsDatas) > 0 && len(execInfo.rsDatas[0]) > 0 {
+			result.insertId = Dm_build_1355.Dm_build_1585(execInfo.rsDatas[0][1])
+		} else {
+			result.insertId = 0
+		}
+	} else {
+		result.insertId = execInfo.lastInsertId
+	}
 	result.idGenerator = dmResultIDGenerator
 
 	return &result
 }
 
-/*************************************************************
- ** PUBLIC METHODS AND FUNCTIONS
- *************************************************************/
 func (r *DmResult) LastInsertId() (int64, error) {
-	//if err := r.dmStmt.checkClosed(); err != nil {
-	//	return -1, err
-	//}
+
 	if len(r.filterChain.filters) == 0 {
 		return r.lastInsertId()
 	}
@@ -36,9 +42,7 @@ func (r *DmResult) LastInsertId() (int64, error) {
 }
 
 func (r *DmResult) RowsAffected() (int64, error) {
-	//if err := r.dmStmt.checkClosed(); err != nil {
-	//	return -1, err
-	//}
+
 	if len(r.filterChain.filters) == 0 {
 		return r.rowsAffected()
 	}

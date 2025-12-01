@@ -78,6 +78,7 @@ var (
 
 // Svr Msg Err
 var (
+	EC_SRC_MULTI_ROWS        = newDmError(-5004, "error.srcMultiRows")
 	ECGO_DATA_OVERFLOW       = newDmError(-6102, "error.dataOverflow")
 	ECGO_DATETIME_OVERFLOW   = newDmError(-6112, "error.datetimeOverflow")
 	EC_RN_EXCEED_ROWSET_SIZE = newDmError(-7036, "")
