@@ -26,7 +26,8 @@ type DmStatement struct {
 
 	dmConn *DmConnection
 	rsMap  map[int16]*innerRows
-	inUse  bool
+
+	inUse bool
 
 	prepared  bool
 	innerUsed bool
@@ -80,14 +81,55 @@ type DmStatement struct {
 	paramCount int32
 
 	preExec bool
+
+	executeError bool
+
+	poolInfo *pstmtInfo
 }
 
-type stmtPoolInfo struct {
-	id int32
+type stmtInfo struct {
+	handle int32
 
 	cursorName string
 
 	readBaseColName bool
+}
+
+func NewStmtInfo(handle int32, cursorName string, readBaseColName bool) stmtInfo {
+	return stmtInfo{
+		handle,
+		cursorName,
+		readBaseColName,
+	}
+}
+
+type pstmtInfo struct {
+	stmtInfo
+
+	sql string
+
+	params []parameter
+
+	paramCount int32
+
+	execInfo *execRetInfo
+
+	ts time.Time
+
+	columns []column
+}
+
+func NewPstmtInfo(handle int32, cursorName string, readBaseColName bool, sql string,
+	params []parameter, execInfo *execRetInfo, columns []column) pstmtInfo {
+	return pstmtInfo{
+		NewStmtInfo(handle, cursorName, readBaseColName),
+		sql,
+		params,
+		int32(len(params)),
+		execInfo,
+		time.Now(),
+		columns,
+	}
 }
 
 type rsPoolKey struct {
@@ -370,14 +412,22 @@ func (st *DmStatement) prepare() error {
 }
 
 func (stmt *DmStatement) close() error {
-	delete(stmt.dmConn.stmtMap, stmt.id)
 	if stmt.closed {
 		return nil
 	}
-	stmt.inUse = true
+	for _, rs := range stmt.rsMap {
+		rs.Close()
+	}
+	delete(stmt.dmConn.stmtMap, stmt.id)
+	stmt.inUse = false
 
-	return stmt.free()
-
+	defer func() {
+		stmt.closed = true
+	}()
+	if !stmt.pool() {
+		return stmt.free()
+	}
+	return nil
 }
 
 func (stmt *DmStatement) numInput() int {
@@ -469,30 +519,35 @@ func (stmt *DmStatement) queryContext(ctx context.Context, args []driver.NamedVa
 	return rows, err
 }
 
-func NewDmStmt(conn *DmConnection, sql string) (*DmStatement, error) {
+func NewDmStmt(conn *DmConnection, sql string, prepare bool) (*DmStatement, bool, error) {
 	var s *DmStatement
 
-	if s == nil {
-		s = new(DmStatement)
-		s.resetFilterable(&conn.filterable)
-		s.objId = -1
-		s.idGenerator = dmStmtIDGenerator
-		s.dmConn = conn
-		s.maxRows = int64(conn.dmConnector.maxRows)
-		s.nativeSql = sql
-		s.rsMap = make(map[int16]*innerRows)
-		s.inUse = true
-		s.isBatch = conn.isBatch
+	s = new(DmStatement)
+	s.resetFilterable(&conn.filterable)
+	s.objId = -1
+	s.idGenerator = dmStmtIDGenerator
+	s.dmConn = conn
+	s.maxRows = int64(conn.dmConnector.maxRows)
+	s.nativeSql = sql
+	s.rsMap = make(map[int16]*innerRows)
+	s.inUse = true
+	s.isBatch = conn.isBatch
 
+	var spi interface{}
+
+	if spi != nil {
+		pool := spi.(stmtInfo)
+		s.id = pool.handle
+		s.cursorName = pool.cursorName
+		s.readBaseColName = pool.readBaseColName
+	} else {
 		err := conn.Access.Dm_build_475(s)
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
-
-		conn.stmtMap[s.id] = s
 	}
-
-	return s, nil
+	conn.stmtMap[s.id] = s
+	return s, false, nil
 
 }
 
@@ -504,6 +559,11 @@ func (stmt *DmStatement) checkClosed() error {
 	}
 
 	return nil
+}
+
+func (stmt *DmStatement) pool() bool {
+
+	return false
 }
 
 func (stmt *DmStatement) free() error {
@@ -1029,11 +1089,14 @@ func namedValueToValue(stmt *DmStatement, named []driver.NamedValue) ([]driver.V
 	dargs := make([]driver.Value, stmt.paramCount)
 	for i, _ := range dargs {
 		found := false
-		for _, nv := range named {
-			if nv.Name != "" && strings.ToUpper(nv.Name) == strings.ToUpper(stmt.serverParams[i].name) {
-				dargs[i] = nv.Value
-				found = true
-				break
+		if stmt.serverParams[i].name != "" {
+			paramNameUpper := strings.ToUpper(stmt.serverParams[i].name)
+			for _, nv := range named {
+				if nv.Name != "" && strings.ToUpper(nv.Name) == paramNameUpper {
+					dargs[i] = nv.Value
+					found = true
+					break
+				}
 			}
 		}
 
@@ -1057,6 +1120,7 @@ func (stmt *DmStatement) executeInner(args []driver.Value, executeType int16) (e
 	}
 	stmt.execInfo, err = stmt.dmConn.Access.Dm_build_533(stmt, bytes, false)
 	if err != nil {
+		stmt.executeError = true
 		return err
 	}
 	if stmt.execInfo.outParamDatas != nil {

@@ -2,74 +2,108 @@
  * Copyright (c) 2000-2018, 达梦数据库有限公司.
  * All rights reserved.
  */
-
 package util
 
 import (
-	"go/build"
-	"os"
-	"runtime"
-	"strings"
+	"container/list"
+	"sync"
 )
 
-const (
-	PathSeparator     = string(os.PathSeparator)
-	PathListSeparator = string(os.PathListSeparator)
-)
-
-var (
-	goRoot = build.Default.GOROOT
-	goPath = build.Default.GOPATH //获取实际编译时的GOPATH值
-)
-
-type fileUtil struct {
+// CacheQueue 固定大小的队列缓存
+type CacheQueue struct {
+	maxSize      int
+	mu           sync.Mutex
+	list         *list.List
+	enableLRU    bool
+	beforeRemove func(interface{})
 }
 
-var FileUtil = &fileUtil{}
+// NewLRU 创建 LRU 缓存
+func NewCacheQueue(maxSize int, enableLRU bool, beforeRemove func(interface{})) *CacheQueue {
+	return &CacheQueue{
+		maxSize:      maxSize,
+		list:         list.New(),
+		enableLRU:    enableLRU,
+		beforeRemove: beforeRemove,
+	}
+}
 
-func (fileUtil *fileUtil) Exists(path string) bool {
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
+// Get 获取值
+func (c *CacheQueue) Get() (interface{}, bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	elem := c.list.Front()
+	if elem == nil {
+		return nil, false
+	}
+	c.list.Remove(elem)
+	return elem.Value, true
+}
+
+// Put 放入缓存
+// 如果容量已满，则删除队首（最老）元素
+func (c *CacheQueue) Put(value interface{}) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	// 如果已存在，则直接返回
+	for elem := c.list.Front(); elem != nil; elem = elem.Next() {
+		if elem.Value == value {
+			return true
+		}
+	}
+	if c.list.Len() < c.maxSize {
+		// 新元素插入队尾
+		c.list.PushBack(value)
 		return true
+	} else if c.enableLRU {
+		elem := c.list.Front()
+		c.beforeRemove(elem.Value)
+		c.list.Remove(elem)
+		c.list.PushBack(value)
+		return true
+	} else {
+		c.beforeRemove(value)
+		return false
+	}
+}
+
+// Contains 检查 value 是否存在
+func (c *CacheQueue) Contains(value interface{}) bool {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	for elem := c.list.Front(); elem != nil; elem = elem.Next() {
+		if elem.Value == value {
+			return true
+		}
 	}
 	return false
 }
 
-func (fileUtil *fileUtil) Search(relativePath string) (path string) {
-	if strings.Contains(runtime.GOOS, "windows") {
-		relativePath = strings.ReplaceAll(relativePath, "/", "\\")
+// Size 返回当前大小
+func (c *CacheQueue) Size() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return c.list.Len()
+}
+
+// Clear 清空缓存
+func (c *CacheQueue) Clear() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.list.Init()
+}
+
+// Values 返回所有 value（从旧到新）
+func (c *CacheQueue) Values() []interface{} {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	values := make([]interface{}, 0, c.list.Len())
+	for elem := c.list.Front(); elem != nil; elem = elem.Next() {
+		values = append(values, elem.Value)
 	}
-
-	if fileUtil.Exists(goPath) {
-		for _, s := range strings.Split(goPath, PathListSeparator) {
-			path = s + PathSeparator + "src" + PathSeparator + relativePath
-			if fileUtil.Exists(path) {
-				return path
-			}
-		}
-	}
-
-	if fileUtil.Exists(goPath) {
-		for _, s := range strings.Split(goPath, PathListSeparator) {
-			path = s + PathSeparator + "pkg" + PathSeparator + relativePath
-			if fileUtil.Exists(path) {
-				return path
-			}
-		}
-	}
-
-	//if workDir, _ := os.Getwd(); fileUtil.Exists(workDir) {
-	//	path = workDir + PathSeparator + "src" + PathSeparator + relativePath
-	//	if fileUtil.Exists(path) {
-	//		return path
-	//	}
-	//}
-
-	//if fileUtil.Exists(goRoot) {
-	//	path = goRoot + PathSeparator + "src" + PathSeparator + relativePath
-	//	if fileUtil.Exists(path) {
-	//		return path
-	//	}
-	//}
-
-	return ""
+	return values
 }

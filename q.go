@@ -308,6 +308,10 @@ func NewDmIntervalDTByString(str string) (dt *DmIntervalDT, err error) {
 			strSecPrec = "(" + strings.TrimSpace(leadStr[:colonIndex+1])
 		}
 
+		if strings.Contains(leadStr, "TO") {
+			return nil, ECGO_INVALID_TIME_INTERVAL.throw()
+		}
+
 		if err := dt.setPrecForSvr(leadStr, strLeadPrec, strSecPrec); err != nil {
 			return nil, ECGO_INVALID_TIME_INTERVAL.throw()
 		}

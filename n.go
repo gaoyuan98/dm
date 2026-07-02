@@ -93,7 +93,9 @@ const (
 	RowPrefetchKey          = "rowPrefetch"
 	BufPrefetchKey          = "bufPrefetch"
 	LobModeKey              = "LobMode"
-	StmtPoolSizeKey         = "StmtPoolSize"
+	StmtPoolSizeKey         = "stmtPoolSize"
+	PstmtPoolSizeKey        = "pstmtPoolSize"
+	PstmtPoolValidTimeKey   = "pstmtPoolValidTime"
 
 	AlwayseAllowCommitKey    = "AlwayseAllowCommit"
 	BatchTypeKey             = "batchType"
@@ -375,7 +377,11 @@ type DmConnector struct {
 
 	lobMode int
 
-	stmtPoolMaxSize int
+	stmtPoolSize int
+
+	pstmtPoolSize int
+
+	pstmtPoolValidTime int64
 
 	alwayseAllowCommit bool
 
@@ -488,7 +494,9 @@ func (c *DmConnector) init() *DmConnector {
 	c.rowPrefetch = rowPrefetchDef
 	c.bufPrefetch = bufPrefetchDef
 	c.lobMode = lobModeDef
-	c.stmtPoolMaxSize = stmtPoolMaxSizeDef
+	c.stmtPoolSize = stmtPoolMaxSizeDef
+	c.pstmtPoolSize = 0
+	c.pstmtPoolValidTime = 0
 
 	c.alwayseAllowCommit = alwayseAllowCommitDef
 	c.batchType = 1
@@ -588,7 +596,9 @@ func (c *DmConnector) setAttributes(props *Properties) error {
 	c.rowPrefetch = props.GetInt(RowPrefetchKey, c.rowPrefetch, 0, int(INT32_MAX))
 	c.bufPrefetch = props.GetInt(BufPrefetchKey, c.bufPrefetch, int(Dm_build_771), int(Dm_build_772))
 	c.lobMode = props.GetInt(LobModeKey, c.lobMode, 1, 2)
-	c.stmtPoolMaxSize = props.GetInt(StmtPoolSizeKey, c.stmtPoolMaxSize, 0, int(INT32_MAX))
+	c.stmtPoolSize = props.GetInt(StmtPoolSizeKey, c.stmtPoolSize, 0, int(INT32_MAX))
+	c.pstmtPoolSize = props.GetInt(PstmtPoolSizeKey, c.pstmtPoolSize, 0, int(INT32_MAX))
+	c.pstmtPoolValidTime = int64(props.GetInt(PstmtPoolValidTimeKey, int(c.pstmtPoolValidTime), 0, int(INT32_MAX)))
 
 	c.alwayseAllowCommit = props.GetBool(AlwayseAllowCommitKey, c.alwayseAllowCommit)
 	c.batchType = props.GetInt(BatchTypeKey, c.batchType, 1, 2)

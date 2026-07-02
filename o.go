@@ -119,7 +119,8 @@ func (d DmDecimal) ToBigFloat() *big.Float {
 }
 
 func NewDecimalFromString(s string) (*DmDecimal, error) {
-	num, ok := new(big.Float).SetString(strings.TrimSpace(s))
+
+	num, ok := new(big.Float).SetPrec(256).SetString(strings.TrimSpace(s))
 	if !ok {
 		return nil, ECGO_DATA_CONVERTION_ERROR.throw()
 	}

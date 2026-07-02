@@ -490,6 +490,10 @@ func (sv TypeData) ctlnToBytes(data *DmArray, desc *TypeDescriptor) ([]byte, err
 }
 
 func (sv TypeData) arrayToBytes(data *DmArray, desc *TypeDescriptor) ([]byte, error) {
+
+	if data != nil && desc != nil && desc.m_maxCnt > 0 && data.m_itemCount > desc.m_maxCnt {
+		return nil, ECGO_INVALID_ARRAY_LEN
+	}
 	results := make([][]byte, len(data.m_arrData))
 	var rdata []byte
 	var err error
@@ -1260,47 +1264,165 @@ func (td *TypeData) toJavaArray(arr *DmArray, index int64, l int, dType int) (in
 }
 
 func (td *TypeData) toNumericArray(arr *DmArray, index int64, l int, flag int) (interface{}, error) {
-	if nil == arr.m_objArray {
-		return nil, nil
-	}
 
-	var retObj interface{}
-	switch arr.m_objArray.(type) {
-	case []int16:
+	if arr.m_arrData != nil {
 		if flag == ARRAY_TYPE_SHORT {
-			ret := make([]int16, l)
-			copy(ret[:l], arr.m_objArray.([]int16)[index:index+int64(l)])
-			retObj = ret
+			return toServerShortSlice(index, int64(l), arr.m_arrData)
+		} else if flag == ARRAY_TYPE_INTEGER {
+			return toServerIntSlice(index, int64(l), arr.m_arrData)
+		} else if flag == ARRAY_TYPE_LONG {
+			return toServerLongSlice(index, int64(l), arr.m_arrData)
+		} else if flag == ARRAY_TYPE_FLOAT {
+			return toServerFloatSlice(index, int64(l), arr.m_arrData)
+		} else if flag == ARRAY_TYPE_DOUBLE {
+			return toServerDoubleSlice(index, int64(l), arr.m_arrData)
 		}
-	case []int:
-		if flag == ARRAY_TYPE_INTEGER {
-			ret := make([]int, l)
-			copy(ret[:l], arr.m_objArray.([]int)[index:index+int64(l)])
-			retObj = ret
+	} else if arr.m_arrData == nil && arr.elements != nil {
+
+		if flag == ARRAY_TYPE_SHORT {
+			return toShortSlice(index, int64(l), arr.elements)
+		} else if flag == ARRAY_TYPE_INTEGER {
+			return toIntSlice(index, int64(l), arr.elements)
+		} else if flag == ARRAY_TYPE_LONG {
+			return toLongSlice(index, int64(l), arr.elements)
+		} else if flag == ARRAY_TYPE_FLOAT {
+			return toFloatSlice(index, int64(l), arr.elements)
+		} else if flag == ARRAY_TYPE_DOUBLE {
+			return toDoubleSlice(index, int64(l), arr.elements)
 		}
-	case []int64:
-		if flag == ARRAY_TYPE_LONG {
-			ret := make([]int64, l)
-			copy(ret[:l], arr.m_objArray.([]int64)[index:index+int64(l)])
-			retObj = ret
-		}
-	case []float32:
-		if flag == ARRAY_TYPE_FLOAT {
-			ret := make([]float32, l)
-			copy(ret[:l], arr.m_objArray.([]float32)[index:index+int64(l)])
-			retObj = ret
-		}
-	case []float64:
-		if flag == ARRAY_TYPE_DOUBLE {
-			ret := make([]float64, l)
-			copy(ret[:l], arr.m_objArray.([]float64)[index:index+int64(l)])
-			retObj = ret
-		}
-	default:
-		return nil, ECGO_DATA_CONVERTION_ERROR.throw()
 	}
 
-	return retObj, nil
+	return nil, nil
+}
+
+func toShortSlice(index int64, len int64, v []interface{}) ([]int16, error) {
+	res := make([]int16, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].(int16)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toServerShortSlice(index int64, len int64, v []TypeData) ([]int16, error) {
+	res := make([]int16, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].m_dumyData.(int16)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toIntSlice(index int64, len int64, v []interface{}) ([]int, error) {
+	res := make([]int, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].(int)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toServerIntSlice(index int64, len int64, v []TypeData) ([]int, error) {
+	res := make([]int, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].m_dumyData.(int32)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = int(n)
+	}
+	return res, nil
+}
+
+func toLongSlice(index int64, len int64, v []interface{}) ([]int64, error) {
+	res := make([]int64, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].(int64)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toServerLongSlice(index int64, len int64, v []TypeData) ([]int64, error) {
+	res := make([]int64, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].m_dumyData.(int64)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toFloatSlice(index int64, len int64, v []interface{}) ([]float32, error) {
+	res := make([]float32, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].(float32)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toServerFloatSlice(index int64, len int64, v []TypeData) ([]float32, error) {
+	res := make([]float32, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].m_dumyData.(float32)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toDoubleSlice(index int64, len int64, v []interface{}) ([]float64, error) {
+	res := make([]float64, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].(float64)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
+}
+
+func toServerDoubleSlice(index int64, len int64, v []TypeData) ([]float64, error) {
+	res := make([]float64, len)
+	for ; index < len; index++ {
+
+		n, ok := v[index].m_dumyData.(float64)
+		if !ok {
+			return nil, ECGO_DATA_CONVERTION_ERROR.throw()
+		}
+		res[index] = n
+	}
+	return res, nil
 }
 
 func (td *TypeData) toJavaArrayByDmStruct(st *DmStruct) ([]interface{}, error) {

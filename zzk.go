@@ -226,12 +226,19 @@ func (dc *DmConnection) execOpt(sql string, optParamList []OptParameter, serverE
 		case parser.DOUBLE:
 			{
 				nsql.WriteString("?")
-				f, err := strconv.ParseFloat(lval.Value, 64)
-				if err != nil {
-					return sql, nil, err
-				}
 
-				optParamList = append(optParamList, newOptParameter(G2DB.toFloat64(f), DOUBLE, DOUBLE_PREC))
+				decimalBytes, err := G2DB.toDecimal(lval.Value)
+				if err == nil {
+					optParamList = append(optParamList, newOptParameter(decimalBytes, DECIMAL, 0))
+				} else {
+
+					f, err := strconv.ParseFloat(lval.Value, 64)
+					if err != nil {
+						return sql, nil, err
+					}
+
+					optParamList = append(optParamList, newOptParameter(G2DB.toFloat64(f), DOUBLE, DOUBLE_PREC))
+				}
 			}
 		case parser.DECIMAL:
 			{

@@ -587,7 +587,6 @@ func (dm_build_583 *dm_build_414) Close() error {
 		return dm_build_584
 	}
 
-	dm_build_583.dm_build_418 = nil
 	dm_build_583.dm_build_425 = true
 	return nil
 }

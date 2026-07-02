@@ -2,56 +2,37 @@
  * Copyright (c) 2000-2018, 达梦数据库有限公司.
  * All rights reserved.
  */
+
 package util
 
-const (
-	LINE_SEPARATOR = "\n"
-)
-
-// 执行f并忽略panic
-func AbsorbPanic(f func()){
-	defer func() {
-		if p := recover(); p != nil {
-			// TODO do something
+func Split(s string, sep string) []string {
+	var foot = make([]int, len(s)) // 足够的元素个数
+	var count, sLen, sepLen = 0, len(s), len(sep)
+	for i := 0; i < sLen; i++ {
+		// 处理 s == “-9999-1" && seperators == "-"情况
+		if i == 0 && sLen >= sepLen {
+			if s[0:sepLen] == sep {
+				i += sepLen - 1
+				continue
+			}
 		}
-	}()
-	f()
-}
-
-func SliceEquals(src []byte, dest []byte) bool {
-	if len(src) != len(dest) {
-		return false
-	}
-
-	for i, _ := range src {
-		if src[i] != dest[i] {
-			return false
+		for j := 0; j < sepLen; j++ {
+			if s[i] == sep[j] {
+				foot[count] = i
+				count++
+				break
+			}
 		}
 	}
-
-	return true
-}
-
-// 获取两个数的最大公约数，由调用者确保m、n>=0；如果m或n为0，返回1
-func GCD(m int32, n int32) int32 {
-	if m == 0 || n == 0 {
-		return 1
+	var ret = make([]string, count+1)
+	if count == 0 {
+		ret[0] = s
+		return ret
 	}
-	r := m % n
-	m = n
-	n = r
-	if r == 0 {
-		return m
-	} else {
-		return GCD(m, n)
+	ret[0] = s[0:foot[0]]
+	for i := 1; i < count; i++ {
+		ret[i] = s[foot[i-1]+1 : foot[i]]
 	}
-}
-
-// 返回切片中所有数的累加值
-func Sum(arr []int32) int32 {
-	var sum int32 = 0
-	for _, i := range arr {
-		sum += i
-	}
-	return sum
+	ret[count] = s[foot[count-1]+1:]
+	return ret
 }

@@ -1121,7 +1121,7 @@ func (lexer *Lexer) Yylex() (*LVal, error) {
 				{
 					lexer.debug("<xq>{xq_double}")
 
-					lexer.ltstr += "\\'"
+					lexer.ltstr += "'"
 				}
 				fallthrough
 			case 76:

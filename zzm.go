@@ -288,6 +288,10 @@ func SetServerGroupProperties(props *Properties, key string, value string) bool 
 		props.Set(MppLocalKey, value)
 	} else if key == "OS_NAME" {
 		props.Set(OsNameKey, value)
+	} else if key == "PSTMT_POOL_SIZE" {
+		props.Set(PstmtPoolSizeKey, value)
+	} else if key == "PSTMT_POOL_VALID_TIME" {
+		props.Set(PstmtPoolValidTimeKey, value)
 	} else if key == "RS_CACHE_SIZE" {
 		props.Set(RsCacheSizeKey, value)
 	} else if key == "RS_REFRESH_FREQ" {
