@@ -29,6 +29,8 @@ const (
 		"on archIni.arch_dest = mailIni.mal_inst_name " + "left join V$MAL_LINK_STATUS " +
 		"on CTL_LINK_STATUS  = 'CONNECTED' AND DATA_LINK_STATUS = 'CONNECTED' " +
 		"where archIni.arch_type in ('TIMELY', 'REALTIME') AND  archIni.arch_status = 'VALID'"
+
+	SQL_SELECT_AFC_STANDBY = "SELECT DISTINCT AFC.INST_NAME, AFC.HOST, AFC.PORT FROM V$RAFT_ADDR_INFO AFC"
 )
 
 type rwUtil struct {
@@ -159,7 +161,7 @@ func (RWUtil rwUtil) connectStandby(connection *DmConnection) error {
 }
 
 func (RWUtil rwUtil) chooseValidStandby(connection *DmConnection) (*ep, error) {
-	var filter, filter2 string
+	var filter, filter2, filter3 string
 	var stmt *DmStatement
 	var rs *DmRows
 	var err error
@@ -180,6 +182,7 @@ func (RWUtil rwUtil) chooseValidStandby(connection *DmConnection) (*ep, error) {
 		if len(epStr) > 0 {
 			filter = " and (mailIni.INST_IP || ':'|| mailIni.INST_PORT) in (" + epStr + ")"
 			filter2 = " and (mailIni.mal_INST_HOST || ':'|| mailIni.mal_INST_PORT) in (" + epStr + ")"
+			filter3 = " WHERE (AFC.HOST || ':'|| AFC.PORT) IN (" + epStr + ")"
 		}
 	}
 
@@ -206,6 +209,21 @@ func (RWUtil rwUtil) chooseValidStandby(connection *DmConnection) (*ep, error) {
 			stmt, rs, err = connection.driverQuery(SQL_SELECT_STANDBY2 + filter)
 		} else {
 			stmt, rs, err = connection.driverQuery(SQL_SELECT_STANDBY + filter2)
+		}
+	}
+
+	if err != nil || (rs != nil && rs.CurrentRows.getRowCount() == 0) {
+		afcStmt, afcRs, afcErr := connection.driverQuery(SQL_SELECT_AFC_STANDBY + filter3)
+
+		if afcErr != nil {
+			afcRs.close()
+			afcStmt.close()
+		} else {
+
+			rs.close()
+			stmt.close()
+			rs = afcRs
+			stmt = afcStmt
 		}
 	}
 

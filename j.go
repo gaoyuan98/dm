@@ -106,7 +106,8 @@ func newDmArrayByTypeData(atData []TypeData, desc *TypeDescriptor) *DmArray {
 }
 
 func (da *DmArray) checkIndex(index int64) error {
-	if index < 0 || index > int64(len(da.m_arrData)-1) {
+	//本地构建的对象，暂不存在m_arrData，添加判空
+	if index < 0 || (da.m_arrData != nil && index > int64(len(da.m_arrData)-1)) {
 		return ECGO_INVALID_LENGTH_OR_OFFSET.throw()
 	}
 	return nil
@@ -117,8 +118,8 @@ func (da *DmArray) checkIndexAndCount(index int64, count int) error {
 	if err != nil {
 		return err
 	}
-
-	if count <= 0 || index+int64(count) > int64(len(da.m_arrData)) {
+	//本地构建的对象，暂不存在m_arrData，添加判空
+	if count <= 0 || (da.m_arrData != nil && index+int64(count) > int64(len(da.m_arrData))) || (da.elements != nil && index+int64(count) > int64(len(da.elements))) {
 		return ECGO_INVALID_LENGTH_OR_OFFSET.throw()
 	}
 	return nil
@@ -138,6 +139,10 @@ func (da *DmArray) GetBaseTypeName() (string, error) {
 
 // 获取Array对象的go数组对象
 func (da *DmArray) GetArray() (interface{}, error) {
+	//bug688659, 判断数据有效性，无效时抛错
+	if !da.Valid {
+		return nil, ECGO_IS_NULL.throw()
+	}
 	if da.m_arrData == nil || len(da.m_arrData) <= 0 {
 		return nil, nil
 	}

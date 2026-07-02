@@ -145,7 +145,7 @@ func (dc *DmConnection) checkClosed() error {
 
 func (dc *DmConnection) executeInner(query string, execType int16) (interface{}, error) {
 
-	stmt, err := NewDmStmt(dc, query)
+	stmt, _, err := NewDmStmt(dc, query, false)
 
 	if err != nil {
 		return nil, err
@@ -670,13 +670,16 @@ func (dc *DmConnection) prepare(query string) (stmt *DmStatement, err error) {
 	if err = dc.checkClosed(); err != nil {
 		return
 	}
-	if stmt, err = NewDmStmt(dc, query); err != nil {
+	var alreadyPrepared bool
+	if stmt, alreadyPrepared, err = NewDmStmt(dc, query, true); err != nil {
 		return
 	}
-	if err = stmt.prepare(); err != nil {
-		stmt.close()
-		stmt = nil
-		return
+	if !alreadyPrepared {
+		if err = stmt.prepare(); err != nil {
+			stmt.close()
+			stmt = nil
+			return
+		}
 	}
 	return
 }
@@ -713,7 +716,7 @@ func (dc *DmConnection) checkNamedValue(nv *driver.NamedValue) error {
 }
 
 func (dc *DmConnection) driverQuery(query string) (*DmStatement, *DmRows, error) {
-	stmt, err := NewDmStmt(dc, query)
+	stmt, _, err := NewDmStmt(dc, query, false)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -824,6 +827,14 @@ func (conn *DmConnection) watchCancel(ctx context.Context) error {
 	conn.watching = true
 	conn.watcher <- ctx
 	return nil
+}
+
+func (conn *DmConnection) GetExecId() int {
+	if conn.lastExecInfo == nil {
+		return 0
+	}
+
+	return int(conn.lastExecInfo.execId)
 }
 
 type noCopy struct{}
