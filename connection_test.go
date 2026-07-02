@@ -9,7 +9,7 @@ import (
 	_ "github.com/gaoyuan98/dm"
 )
 
-const localTestDSN = "dm://SYSDBA:SYSDBA123#@120.53.45.167:5236?socketTimeout=5"
+const localTestDSN = "dm://SYSDBA:SYSDBA123@127.0.0.1:5236?socketTimeout=5"
 
 func TestDMConnectionLocalhost(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
