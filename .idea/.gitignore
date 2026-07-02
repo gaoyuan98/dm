@@ -8,3 +8,5 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+/dm-v1.5.75.iml
+/go.imports.xml
