@@ -6,10 +6,12 @@ package dm
 
 import (
 	"bytes"
-	"github.com/gaoyuan98/dm/parser"
-	"github.com/gaoyuan98/dm/util"
 	"strconv"
 	"strings"
+
+	"github.com/gaoyuan98/dm/parser"
+
+	"github.com/gaoyuan98/dm/util"
 )
 
 func (dc *DmConnection) lex(sql string) ([]*parser.LVal, error) {
@@ -261,7 +263,7 @@ func (dc *DmConnection) execOpt(sql string, optParamList []OptParameter, serverE
 					if backSlashFlag {
 						lval.Value = util.StringUtil.Translate(lval.Value)
 					}
-					optParamList = append(optParamList, newOptParameter(Dm_build_1355.Dm_build_1571(lval.Value, serverEncoding, dc), VARCHAR, VARCHAR_PREC))
+					optParamList = append(optParamList, newOptParameter(Dm_build_1332.Dm_build_1548(lval.Value, serverEncoding, dc), VARCHAR, VARCHAR_PREC))
 				}
 			}
 		case parser.HEX_INT:

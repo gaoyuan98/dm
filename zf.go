@@ -8,10 +8,11 @@ package dm
 import (
 	"context"
 	"database/sql/driver"
-	"github.com/gaoyuan98/dm/util"
 	"io"
 	"reflect"
 	"time"
+
+	"github.com/gaoyuan98/dm/util"
 )
 
 const SQL_GET_DSC_EP_SITE = "SELECT " +

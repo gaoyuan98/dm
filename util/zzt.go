@@ -35,6 +35,14 @@ func (fileUtil *fileUtil) Exists(path string) bool {
 	return false
 }
 
+func (fileUtil *fileUtil) IsDir(path string) bool {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return fileInfo.IsDir()
+}
+
 func (fileUtil *fileUtil) Search(relativePath string) (path string) {
 	fmt.Printf("build.Default.GOPATH = '%s'\n", build.Default.GOPATH)
 	fmt.Printf("os.Getenv(\"GOPATH\") = '%s'\n", os.Getenv("GOPATH"))

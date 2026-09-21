@@ -8,8 +8,9 @@ package dm
 import (
 	"bytes"
 	"fmt"
-	"github.com/gaoyuan98/dm/i18n"
 	"runtime"
+
+	"github.com/gaoyuan98/dm/i18n"
 )
 
 // 驱动级错误
@@ -76,7 +77,7 @@ var (
 	ECGO_FATAL_ERROR     = newDmError(20004, "error.fatalError")
 )
 
-// Svr Msg Err
+//Svr Msg Err
 var (
 	EC_SRC_MULTI_ROWS        = newDmError(-5004, "error.srcMultiRows")
 	ECGO_DATA_OVERFLOW       = newDmError(-6102, "error.dataOverflow")

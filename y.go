@@ -7,10 +7,11 @@ package dm
 
 import (
 	"bytes"
-	"github.com/gaoyuan98/dm/util"
 	"math/rand"
 	"sync"
 	"time"
+
+	"github.com/gaoyuan98/dm/util"
 )
 
 /**

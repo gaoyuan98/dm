@@ -216,7 +216,7 @@ func (StringUtil *stringutil) SubstringBetween(str string, open string, close st
 	}
 }
 
-// bug656976 在常量参数化时，将\+任意字符的两个字符解析成一个转义后字符，如：
+//bug656976 在常量参数化时，将\+任意字符的两个字符解析成一个转义后字符，如：
 // 字符串参数'a\nb'解析成字符串参数'a换行b'
 func (StringUtil *stringutil) Translate(s string) string {
 	if !strings.ContainsRune(s, '\\') {
