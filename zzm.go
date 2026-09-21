@@ -7,13 +7,15 @@ package dm
 
 import (
 	"bufio"
-	"github.com/gaoyuan98/dm/util"
 	"io"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/gaoyuan98/dm/util"
 )
 
 var LogDirDef, _ = os.Getwd()
@@ -121,9 +123,13 @@ var (
 // filePath: dm_svc.conf 文件路径
 func load(filePath string) {
 	if filePath == "" {
-		// 如果设置了环境变量则环境变量优先
 		filePath = os.Getenv("DM_SVC_PATH")
-		if filePath == "" {
+		if filePath != "" {
+			// 如果设置了环境变量则环境变量优先
+			if util.FileUtil.Exists(filePath) && util.FileUtil.IsDir(filePath) {
+				filepath.Join(filePath, "dm_svc.conf")
+			}
+		} else {
 			// 否则使用默认
 			switch runtime.GOOS {
 			case "windows":
@@ -320,10 +326,12 @@ func SetServerGroupProperties(props *Properties, key string, value string) bool 
 		props.Set(SocketTimeoutKey, value)
 	} else if key == "SSL_CERT_PATH" {
 		props.Set(SslCertPathKey, value)
-	} else if key == "SSL_FILES_PATH" {
-		props.Set(SslFilesPathKey, value)
 	} else if key == "SSL_KEY_PATH" {
 		props.Set(SslKeyPathKey, value)
+	} else if key == "SSL_PATH" {
+		props.Set(SslPathKey, value)
+	} else if key == "SSL_PWD" {
+		props.Set(SslPwdKey, value)
 	} else if key == "STAT_DIR" {
 		props.Set(StatDirKey, value)
 	} else if key == "STAT_ENABLE" {

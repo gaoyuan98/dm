@@ -244,7 +244,7 @@ func (parameter *parameter) resetType(colType int32) {
 	case DATETIME2_TZ:
 		parameter.prec = DATETIME2_TZ_PREC
 		parameter.scale = 9
-	case REAL, DOUBLE, DECIMAL, INTERVAL_YM, INTERVAL_DT, ARRAY, CLASS, PLTYPE_RECORD, SARRAY:
+	case REAL,DOUBLE,DECIMAL,INTERVAL_YM,INTERVAL_DT,ARRAY,CLASS,PLTYPE_RECORD,SARRAY:
 		parameter.prec = 0
 	case UNKNOWN, NULL:
 		// UNKNOWN 导致服务器断言 // setNull导致服务器报错“字符转换失败”
@@ -257,7 +257,7 @@ func (parameter *parameter) resetType(colType int32) {
 func (execInfo *execRetInfo) union(other *execRetInfo, startRow int, count int) {
 	if count == 1 {
 		execInfo.updateCounts[startRow] = other.updateCount
-	} else if execInfo.updateCounts != nil && other.updateCounts != nil {
+	} else if execInfo.updateCounts != nil && other.updateCounts != nil{
 		copy(execInfo.updateCounts[startRow:startRow+count], other.updateCounts[0:count])
 	}
 	if execInfo.outParamDatas != nil {

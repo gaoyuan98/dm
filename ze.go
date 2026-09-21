@@ -9,11 +9,12 @@ import (
 	"context"
 	"database/sql/driver"
 	"fmt"
-	"github.com/gaoyuan98/dm/util"
 	"io"
 	"reflect"
 	"strconv"
 	"time"
+
+	"github.com/gaoyuan98/dm/util"
 )
 
 type logFilter struct{}

@@ -21,7 +21,7 @@ func newDmResult(bs *DmStatement, execInfo *execRetInfo) *DmResult {
 
 	if execInfo.lastInsertId == 0 && execInfo.hasResultSet && strings.Index(execInfo.nativeSQL, "/*DMGORM-UPSERT*/") == 0 {
 		if len(execInfo.rsDatas) > 0 && len(execInfo.rsDatas[0]) > 0 {
-			result.insertId = Dm_build_1355.Dm_build_1585(execInfo.rsDatas[0][1])
+			result.insertId = Dm_build_1332.Dm_build_1562(execInfo.rsDatas[0][1])
 		} else {
 			result.insertId = 0
 		}

@@ -9,7 +9,7 @@ const (
 )
 
 // 执行f并忽略panic
-func AbsorbPanic(f func()) {
+func AbsorbPanic(f func()){
 	defer func() {
 		if p := recover(); p != nil {
 			// TODO do something

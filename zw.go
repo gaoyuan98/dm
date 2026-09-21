@@ -6,11 +6,12 @@
 package dm
 
 import (
-	"github.com/gaoyuan98/dm/util"
 	"math/rand"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/gaoyuan98/dm/util"
 )
 
 var rwMap sync.Map
